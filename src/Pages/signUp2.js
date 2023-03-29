@@ -1,21 +1,18 @@
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Colors from "../color";
 import SignUpNavigationBar from "../Component/signUpNavigatorBar";
 import Input from "../Component/input";
-import SegmentedBtns from "../Component/segmentedBtns";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import DatePicker from "../Component/dateTimePicker";
 import Btn from "../Component/button";
 
-function SignUp1({ navigation }) {
+function SignUp2({ navigation }) {
   const back = () => {
-    navigation.navigate("login");
+    navigation.navigate("signUp1");
   };
 
   const nextSignUp = () => {
-    navigation.navigate("signUp2");
+    navigation.navigate("signUp1");
   };
 
   const finalSignUp = () => {
@@ -54,37 +51,15 @@ function SignUp1({ navigation }) {
       </View>
 
       <View style={styles.signUpContent}>
-        <SignUpNavigationBar pageNumber={1} goPage2={nextSignUp} goPage3={finalSignUp}></SignUpNavigationBar>
-        <Text style={[styles.title2,{paddingTop:30}]}>المعلومات الشخصية</Text>
-        <Input label="الإسم الرباعي"></Input>
-        <Input label="رقم الهوية" keyboardType="numeric"></Input>
-        <SegmentedBtns
-          firstValue="ذكر"
-          firstIcon="human-male"
-          secValue="أنثى"
-          secIcon="human-female"
-          
-        ></SegmentedBtns>
-        <SegmentedBtns
-          firstValue="محامي"
-          firstIcon="scale-balance"
-          secValue="مواطن"
-          secIcon="human-male-female-child"
-          
-        ></SegmentedBtns>
-        <DatePicker></DatePicker>
-        <Input label="الحالة الإجتماعية"></Input>
-        <View
-          style={{
-            width: "100%",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Input label="المدينة" width="48%"></Input>
-          <Input label="العنوان" width="48%"></Input>
-        </View>
-        <Btn value={'التالي'} handler={nextSignUp}></Btn>
+        <SignUpNavigationBar pageNumber={2} goPage1={nextSignUp} goPage3={finalSignUp}></SignUpNavigationBar>
+        <Text style={[styles.title2,{paddingTop:30}]}> معلومات الحساب</Text>
+        <Input label="البريد الإلكتروني" keyboardType="email-address"></Input>
+        <Input label="رقم الجوال" keyboardType="numeric"></Input>
+
+        <Input label="كلمة المرور" isPassword={true}></Input>
+        <Input label="تأكيد كلمة المرور" isPassword={true}></Input>
+
+        <Btn value={'التالي'} handler={finalSignUp}></Btn>
       </View>
     </View>
   );
@@ -128,4 +103,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUp1;
+export default SignUp2;

@@ -3,28 +3,41 @@ import { StyleSheet, Text, View } from "react-native";
 import { DefaultTheme, SegmentedButtons } from "react-native-paper";
 import Colors from "../color";
 
-function SegmentedBtns() {
+function SegmentedBtns(props) {
   const [value, setValue] = React.useState("");
-  return (
 
+  return (
     <SegmentedButtons
-    //   style={styles.segmentedBtns}
+      //   style={styles.segmentedBtns}
+      style={{paddingVertical:7}}
       value={value}
       onValueChange={setValue}
       buttons={[
         {
-          value: "ذكر",
-          label: "ذكر",
-          icon: "human-male",
-          style: styles.segmentedBtns,
-          checkedColor: Colors.darkGreen,
+          value: props.firstValue,
+          label: props.firstValue,
+          icon: props.firstIcon,
+          style: {
+            backgroundColor:
+              value === props.firstValue
+                ? Colors.darkGreen
+                : Colors.lightVanilla1,
+            borderColor: Colors.lightVanilla1,
+          },
+          checkedColor: Colors.lightVanilla,
         },
         {
-          value: "أنثى",
-          label: "أنثى",
-          icon: "human-female",
-          style: styles.segmentedBtns,
-          checkedColor: Colors.darkGreen,
+          value: props.secValue,
+          label: props.secValue,
+          icon: props.secIcon,
+          style: {
+            backgroundColor:
+              value === props.secValue
+                ? Colors.darkGreen
+                : Colors.lightVanilla1,
+            borderColor: Colors.lightVanilla1,
+          },
+          checkedColor: Colors.lightVanilla,
         },
       ]}
     />

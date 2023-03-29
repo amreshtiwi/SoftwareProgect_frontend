@@ -21,7 +21,7 @@ function LoginPage({ navigation }) {
   const [isValid, setIsValid] = useState(false);
 
   function signUpNavigation() {
-    navigation.navigate("signUp");
+    navigation.navigate("signUp1");
   }
 
   const signInHandler = () => {

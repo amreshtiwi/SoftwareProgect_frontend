@@ -7,6 +7,9 @@ import SignUp1 from "./src/Pages/signUp1";
 import LoginPage from "./src/Pages/login";
 import SignUp2 from "./src/Pages/signUp2";
 import SignUp3 from "./src/Pages/signUp3";
+import HomePage from "./src/Pages/homePage";
+import ProfilePage from "./src/Pages/ProfilePage";
+import DrawerNavigation from "./src/Component/drawerNavigator";
 
 I18nManager.forceRTL(true);
 
@@ -31,8 +34,9 @@ export default function App() {
         >
           {/* <Stack.Screen name="login" component={LoginPage} />
           <Stack.Screen name="signUp1" component={SignUp1} />
-          <Stack.Screen name="signUp2" component={SignUp2} /> */}
-          <Stack.Screen name="signUp3" component={SignUp3} />
+          <Stack.Screen name="signUp2" component={SignUp2} />
+          <Stack.Screen name="signUp3" component={SignUp3} /> */}
+          <Stack.Screen name="drawer" component={DrawerNavigation}/>
         </Stack.Navigator>
       </NavigationContainer>
       {/* <LoginPage></LoginPage> */}

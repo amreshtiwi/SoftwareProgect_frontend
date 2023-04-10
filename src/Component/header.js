@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
 import Colors from "../color";
 
-function Header({navigation, name = 'فلان' }) {
+function Header({ navigation, name = "فلان" }) {
   const [notification, setNotfication] = useState(false);
   const toggleNotification = () => {
     setNotfication(!notification);
@@ -32,9 +32,7 @@ function Header({navigation, name = 'فلان' }) {
             source={require("frontend/assets/logo.png")}
           />
         </View>
-        <Text style={[styles.title, { marginHorizontal: 10 }]}>
-          {name}
-        </Text>
+        <Text style={[styles.title, { marginHorizontal: 10 }]}>{name}</Text>
       </View>
       <View style={{ flexDirection: "row" }}>
         <Pressable onPress={toggleNotification}>
@@ -67,21 +65,21 @@ function Header({navigation, name = 'فلان' }) {
 }
 
 const styles = StyleSheet.create({
-    bar: {
-        flexDirection: "row",
-        backgroundColor: Colors.darkGreen,
-        width: "100%",
-        height: 70,
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 10,
-        borderRadius: 20,
-        elevation: 10,
-      },
-      title: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: Colors.lightVanilla,
-      },
+  bar: {
+    flexDirection: "row",
+    backgroundColor: Colors.darkGreen,
+    width: "100%",
+    height: 70,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    elevation: 10,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: Colors.lightVanilla,
+  },
 });
 export default Header;

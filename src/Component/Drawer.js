@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { Entypo,FontAwesome,Fontisto  } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Fontisto } from "@expo/vector-icons";
 
 import Colors from "../color";
 
@@ -13,7 +13,7 @@ function DrawerSideBar() {
             width: 90,
             height: 90,
             borderRadius: 70,
-            backgroundColor: '#fff',
+            backgroundColor: "#fff",
           }}
           source={require("frontend/assets/User-avatar.png")}
         />
@@ -22,25 +22,25 @@ function DrawerSideBar() {
 
       <View style={{ width: "100%" }}>
         <Pressable style={styles.drawerItem}>
-          <Text style={{marginHorizontal:20}}>الصفحة الرئيسية</Text>
+          <Text style={{ marginHorizontal: 20 }}>الصفحة الرئيسية</Text>
           <Entypo name="home" size={24} color={Colors.darkGreen} />
         </Pressable>
         <Pressable style={styles.drawerItem}>
-          <Text style={{marginHorizontal:20}}>الصفحة الشخصية</Text>
+          <Text style={{ marginHorizontal: 20 }}>الصفحة الشخصية</Text>
           <FontAwesome name="user" size={24} color={Colors.darkGreen} />
         </Pressable>
         <Pressable style={styles.drawerItem}>
-          <Text style={{marginHorizontal:20}}>الإعدادات</Text>
+          <Text style={{ marginHorizontal: 20 }}>الإعدادات</Text>
           <Fontisto name="player-settings" size={24} color={Colors.darkGreen} />
         </Pressable>
         <Pressable style={styles.drawerItem}>
-          <Text style={{marginHorizontal:20}}>تسجيل الخروج</Text>
+          <Text style={{ marginHorizontal: 20 }}>تسجيل الخروج</Text>
           <Entypo name="log-out" size={24} color={Colors.darkGreen} />
         </Pressable>
       </View>
 
       <View>
-        <Text style={{color:'gray'}}>عمرو و أحمد</Text>
+        <Text style={{ color: "gray" }}>عمرو و أحمد</Text>
       </View>
     </View>
   );
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor:Colors.lightVanilla,
+    backgroundColor: Colors.lightVanilla,
   },
   imageNameContainer: {
     alignItems: "center",
@@ -63,10 +63,10 @@ const styles = StyleSheet.create({
     width: "95%",
     backgroundColor: Colors.lightVanilla1,
     flexDirection: "row",
-    justifyContent:"space-between",
-    padding:10,
-    margin:5,
-    borderRadius: 20
+    justifyContent: "space-between",
+    padding: 10,
+    margin: 5,
+    borderRadius: 20,
   },
 });
 export default DrawerSideBar;

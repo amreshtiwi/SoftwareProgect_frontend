@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View} from "react-native";
 import Colors from "../color";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 147,
     borderRadius: 20,
-    opacity:0.4
+    opacity: 0.4,
   },
 });
 export default AddID;

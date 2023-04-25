@@ -10,13 +10,23 @@ import {
   View,
 } from "react-native";
 import HeaderPages from "../Component/pagesHeader";
-import { Divider, Searchbar } from "react-native-paper";
+import { Divider, Provider, Searchbar } from "react-native-paper";
 import Colors from "../color";
 import QuestionItem from "../Component/QustionItem";
 import { Ionicons } from "@expo/vector-icons";
+import AddQuestion from "../Component/addQuestion";
+import SearchInput from "../Component/searchInput";
 
 function ForumPage({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [addQuestionModalVisible, setAddQuestionModalVisible] = useState(false);
+
+  const showModal = () => {
+    setAddQuestionModalVisible(true);
+  };
+  const hideModal = () => {
+    setAddQuestionModalVisible(false);
+  };
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
@@ -25,6 +35,7 @@ function ForumPage({ navigation }) {
   };
 
   return (
+    <Provider>
     <View style={{ flex: 1 }}>
       <ScrollView
         style={{ marginTop: 20 }}
@@ -36,13 +47,7 @@ function ForumPage({ navigation }) {
         </View>
 
         <View style={{ backgroundColor: Colors.lightVanilla }}>
-          <Searchbar
-            placeholder="بحث"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            elevation={2}
-            style={{ backgroundColor: Colors.lightVanilla1, margin: 10 }}
-          />
+          <SearchInput onChangeSearch={onChangeSearch} searchQuery={searchQuery}></SearchInput>
         </View>
         <View style={{ alignItems: "center" }}>
           {data.map((item) => {
@@ -50,13 +55,15 @@ function ForumPage({ navigation }) {
           })}
         </View>
       </ScrollView>
-
       <View style={styles.addQuestionBtn}>
-        <Pressable>
+        <Pressable onPress={showModal}>
           <Ionicons name="add-circle" size={26} color={Colors.black} />
         </Pressable>
       </View>
+
+      <AddQuestion visible={addQuestionModalVisible} hideModal={hideModal}></AddQuestion>
     </View>
+    </Provider>
   );
 }
 

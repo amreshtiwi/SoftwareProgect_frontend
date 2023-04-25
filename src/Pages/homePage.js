@@ -21,7 +21,11 @@ function HomePage({ navigation, name = "أهلاً فلان" }) {
 
   const navigateForumPage = () => {
     navigation.navigate("ForumPage");
-  } 
+  }
+  
+  const navigateLawyerPage =() =>{
+    navigation.navigate("LawyerStack");
+  }
   return (
     <View style={styles.container}>
       <Header navigation={navigation} name={name}></Header>
@@ -39,7 +43,7 @@ function HomePage({ navigation, name = "أهلاً فلان" }) {
             color={Colors.darkGreen}
           />
         </HomeBtns>
-        <HomeBtns label={"المحامون"}>
+        <HomeBtns label={"المحامون"} handler={navigateLawyerPage}>
           <FontAwesome5
             name="balance-scale"
             size={24}

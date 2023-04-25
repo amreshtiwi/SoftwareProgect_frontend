@@ -10,6 +10,7 @@ function Input({
   placeholder = "",
   width = "100%",
   isPassword = false,
+  multiline= false,
 }) {
 
   const [passwordVisible, setPasswordVisible] = useState(true);
@@ -25,6 +26,7 @@ function Input({
       disabled={disable}
       placeholder={placeholder}
       secureTextEntry={isPassword}
+      multiline={multiline}
       right={
         isPassword ? (
           <TextInput.Icon

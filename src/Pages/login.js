@@ -11,27 +11,45 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { loginApi } from "../api/loginApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import App, { AuthContext } from "../../App";
 
 I18nManager.forceRTL(true);
-function LoginPage({ navigation }) {
+function LoginPage({ route, navigation }) {
+  const { cation } = route.params;
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  // const [isValid, setIsValid] = useState(false);
+
+  const { signIn } = useContext(AuthContext);
 
   function signUpNavigation() {
     navigation.navigate("signUp1");
   }
 
-  const signInHandler = () => {
-    if (email === "hello" && password === "hello") {
-      console.log("login");
-      setIsValid(false);
-    } else {
-      setIsValid(true);
-    }
-  };
+  // const signInHandler = () => {
+
+  //   loginApi({
+  //     email:email.toLocaleLowerCase(),
+  //     password:password
+  //   }).then((result) => {
+  //     if (result.status == 200) {
+  //       AsyncStorage.setItem("AccessToken", result.data.token);
+  //       navigation.replace("drawer");
+
+  //       setIsValid(false);
+  //     }
+  //     else{
+  //       setIsValid(true);
+  //     }
+  //   }
+  //   ).catch( err => {
+  //     console.error(err)
+  //   })
+  // };
   return (
     <KeyboardAwareScrollView>
       <View style={styles.loginPage}>
@@ -99,7 +117,8 @@ function LoginPage({ navigation }) {
             }}
           />
         </View>
-        {isValid ? (
+        {console.log(JSON.stringify(cation))}
+        {JSON.stringify(cation) == false ? (
           <Text style={{ color: Colors.red }}>
             كلمة المرور أو البريد الإلكتروني غير صحيحة
           </Text>
@@ -115,7 +134,7 @@ function LoginPage({ navigation }) {
           </Pressable>
         </View>
         <Pressable
-          onPress={signInHandler}
+          onPress={() => signIn({ email, password })}
           style={[
             styles.Btn,
             { width: "100%", marginTop: 10, backgroundColor: Colors.darkGreen },

@@ -4,6 +4,7 @@ import { TextInput } from "react-native-paper";
 import Colors from "../color";
 
 function Input({
+  value,
   label,
   keyboardType = "default",
   disable = false,
@@ -11,12 +12,14 @@ function Input({
   width = "100%",
   isPassword = false,
   multiline= false,
+  onChangeText
 }) {
 
   const [passwordVisible, setPasswordVisible] = useState(true);
   return (
     <TextInput
       style={[styles.input, { width: width }]}
+      value={value}
       label={label}
       mode="outlined"
       selectionColor={Colors.lightVanilla1}
@@ -27,6 +30,7 @@ function Input({
       placeholder={placeholder}
       secureTextEntry={isPassword}
       multiline={multiline}
+      onChangeText={onChangeText}
       right={
         isPassword ? (
           <TextInput.Icon

@@ -3,11 +3,24 @@ import { Platform, Pressable, Text, View } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Input from "./input";
 
-function DatePicker() {
-  const [date, setDate] = useState(new Date());
+function DatePicker({value,setValue,setDate}) {
+  // const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
-  const [dateValue, setDateValue] = useState("تاريخ الميلاد");
 
+
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
+  
+  function formatDate(date) {
+    return (
+      [
+        date.getFullYear(),
+        padTo2Digits(date.getMonth() + 1),
+        padTo2Digits(date.getDate()),
+      ].join('-')
+    );
+  }
 
   const showPicker = () => {
     setShow(true);
@@ -19,13 +32,13 @@ function DatePicker() {
 
   const handleConfirm = (date) => {
     setDate(date);
-    setDateValue(date.toLocaleDateString());
+    setValue(formatDate(date));
     setShow(false);
   }
   return (
     <>
       <Pressable style={{ width: "100%" }} onPress={showPicker}>
-        <Input label={dateValue} disable={true}></Input>
+        <Input label={'تاريخ الميلاد'} disable={true} value={value}></Input>
       </Pressable>
       <DateTimePickerModal isVisible={show} mode="date" onConfirm={handleConfirm} onCancel={hidePicker}/>
     </>

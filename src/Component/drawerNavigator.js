@@ -9,9 +9,22 @@ import ForumPage from "../Pages/forumPage";
 import LawyersPage from "../Pages/lawyersPage";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LawyerProfilePage from "../Pages/lawyerProfilePage";
+import BookingPage from "../Pages/bookingPage";
 
 const DrawerNavigator = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
+const LawyerProfileStackNavigatior = createNativeStackNavigator();
+
+const LawyerProfileStack = () => {
+  return( <LawyerProfileStackNavigatior.Navigator
+     screenOptions={{
+       headerShown: false,
+     }}
+   >
+     <LawyerProfileStackNavigatior.Screen name="LawyerProfilePage" component={LawyerProfilePage}/>
+     <LawyerProfileStackNavigatior.Screen name="BookingPage" component={BookingPage}/>
+   </LawyerProfileStackNavigatior.Navigator>);
+ };
 const LawyerStack = () => {
  return( <Stack.Navigator
     screenOptions={{
@@ -19,7 +32,7 @@ const LawyerStack = () => {
     }}
   >
     <Stack.Screen name="LawyerPage" component={LawyersPage}/>
-    <Stack.Screen name="LawyerProfilePage" component={LawyerProfilePage}/>
+    <Stack.Screen name="LawyerProfileStack" component={LawyerProfileStack}/>
   </Stack.Navigator>);
 };
 function DrawerNavigation() {

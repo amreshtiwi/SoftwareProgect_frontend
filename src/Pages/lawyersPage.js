@@ -21,7 +21,7 @@ function LawyersPage({ navigation }) {
   };
 
   const navigateLawyerProfile = () =>{
-    navigation.navigate("LawyerProfilePage");
+    navigation.navigate("LawyerProfileStack");
   }
   return (
     <View>

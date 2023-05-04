@@ -17,39 +17,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import App, { AuthContext } from "../../App";
 
 I18nManager.forceRTL(true);
-function LoginPage({ route, navigation }) {
-  const { cation } = route.params;
+function LoginPage({ navigation }) {
+
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [isValid, setIsValid] = useState(false);
 
-  const { signIn } = useContext(AuthContext);
+  const { authContext , loginCaution} = useContext(AuthContext);
 
   function signUpNavigation() {
-    navigation.navigate("signUp1");
+    navigation.navigate("signUp");
   }
 
-  // const signInHandler = () => {
-
-  //   loginApi({
-  //     email:email.toLocaleLowerCase(),
-  //     password:password
-  //   }).then((result) => {
-  //     if (result.status == 200) {
-  //       AsyncStorage.setItem("AccessToken", result.data.token);
-  //       navigation.replace("drawer");
-
-  //       setIsValid(false);
-  //     }
-  //     else{
-  //       setIsValid(true);
-  //     }
-  //   }
-  //   ).catch( err => {
-  //     console.error(err)
-  //   })
-  // };
   return (
     <KeyboardAwareScrollView>
       <View style={styles.loginPage}>
@@ -117,8 +96,8 @@ function LoginPage({ route, navigation }) {
             }}
           />
         </View>
-        {console.log(JSON.stringify(cation))}
-        {JSON.stringify(cation) == false ? (
+        {console.log(loginCaution)}
+        {loginCaution  ? (
           <Text style={{ color: Colors.red }}>
             كلمة المرور أو البريد الإلكتروني غير صحيحة
           </Text>
@@ -134,7 +113,7 @@ function LoginPage({ route, navigation }) {
           </Pressable>
         </View>
         <Pressable
-          onPress={() => signIn({ email, password })}
+          onPress={() => authContext.signIn({ email, password })}
           style={[
             styles.Btn,
             { width: "100%", marginTop: 10, backgroundColor: Colors.darkGreen },

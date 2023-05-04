@@ -4,14 +4,14 @@ import { DefaultTheme, SegmentedButtons } from "react-native-paper";
 import Colors from "../color";
 
 function SegmentedBtns(props) {
-  const [value, setValue] = React.useState("");
+  // const [value, setValue] = React.useState("");
 
   return (
     <SegmentedButtons
       //   style={styles.segmentedBtns}
-      style={{paddingVertical:7}}
-      value={value}
-      onValueChange={setValue}
+      style={{paddingVertical:5}}
+      value={props.value}
+      onValueChange={props.setValue}
       buttons={[
         {
           value: props.firstValue,
@@ -19,10 +19,11 @@ function SegmentedBtns(props) {
           icon: props.firstIcon,
           style: {
             backgroundColor:
-              value === props.firstValue
+              props.value === props.firstValue
                 ? Colors.darkGreen
                 : Colors.lightVanilla1,
             borderColor: Colors.lightVanilla1,
+            borderRadius:5
           },
           checkedColor: Colors.lightVanilla,
         },
@@ -32,10 +33,11 @@ function SegmentedBtns(props) {
           icon: props.secIcon,
           style: {
             backgroundColor:
-              value === props.secValue
+              props.value === props.secValue
                 ? Colors.darkGreen
                 : Colors.lightVanilla1,
             borderColor: Colors.lightVanilla1,
+            borderRadius:5
           },
           checkedColor: Colors.lightVanilla,
         },

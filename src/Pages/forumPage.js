@@ -1,25 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
-  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import HeaderPages from "../Component/pagesHeader";
-import { Divider, Provider, Searchbar } from "react-native-paper";
+import { ActivityIndicator, Provider, Switch } from "react-native-paper";
 import Colors from "../color";
 import QuestionItem from "../Component/QustionItem";
 import { Ionicons } from "@expo/vector-icons";
 import AddQuestion from "../Component/addQuestion";
 import SearchInput from "../Component/searchInput";
+import { useIsFocused } from "@react-navigation/native";
+import axios from "axios";
+import { getAllPost } from "../api/getAllPostsApi";
 
-function ForumPage({ navigation }) {
+function ForumPage({ navigation, user }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [addQuestionModalVisible, setAddQuestionModalVisible] = useState(false);
+  const [posts, setPosts] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [postDoneModal, setPostDoneModal] = useState(false);
+  const [isSwitchOn, setIsSwitchOn] = useState(false);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    let isMounted = true;
+    let source = axios.CancelToken.source();
+    if (isFocused) {
+      setIsLoading(true); // set isLoading to true when API call starts
+
+      getAllPost()
+        .then((result) => {
+          if (isMounted) {
+            if (isSwitchOn) {
+              setPosts(result.data.filter((item) => item.authorId == user.id));
+            } else {
+              setPosts(result.data);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setIsLoading(false); // set isLoading to false when API call completes
+        });
+    }
+
+    return () => {
+      isMounted = false;
+      source.cancel("Component unmounted");
+      // Cancel any ongoing API requests here
+    };
+  }, [isFocused, postDoneModal, isSwitchOn]);
 
   const showModal = () => {
     setAddQuestionModalVisible(true);
@@ -34,35 +72,62 @@ function ForumPage({ navigation }) {
     navigation.goBack();
   };
 
+  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
   return (
     <Provider>
-    <View style={{ flex: 1 }}>
-      <ScrollView
-        style={{ marginTop: 20 }}
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[1]}
-      >
-        <View style={styles.bar}>
-          <HeaderPages label={"المنتدى"} back={back}></HeaderPages>
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          style={{ marginTop: 20 }}
+          showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[1]}
+        >
+          <View style={styles.bar}>
+            <HeaderPages label={"المنتدى"} back={back}></HeaderPages>
+          </View>
+
+          <View style={{ backgroundColor: Colors.lightVanilla }}>
+            <SearchInput
+              onChangeSearch={onChangeSearch}
+              searchQuery={searchQuery}
+            ></SearchInput>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Switch
+                value={isSwitchOn}
+                onValueChange={onToggleSwitch}
+                color={Colors.darkGreen}
+              />
+              <Text>أسئلتي</Text>
+            </View>
+          </View>
+          <View style={{ alignItems: "center" }}>
+            {isLoading ? (
+              <View>
+                <ActivityIndicator size="large" color={Colors.darkGreen} />
+              </View>
+            ) : posts !== null ? (
+              posts.map((item) => {
+                return <QuestionItem key={item.id} item={item}></QuestionItem>;
+              })
+            ) : (
+              <View>
+                <Text>لا يوجد أسئلة حتى الأن</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+        <View style={styles.addQuestionBtn}>
+          <Pressable onPress={showModal}>
+            <Ionicons name="add-circle" size={26} color={Colors.black} />
+          </Pressable>
         </View>
 
-        <View style={{ backgroundColor: Colors.lightVanilla }}>
-          <SearchInput onChangeSearch={onChangeSearch} searchQuery={searchQuery}></SearchInput>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          {data.map((item) => {
-            return <QuestionItem key={item.id} item={item}></QuestionItem>;
-          })}
-        </View>
-      </ScrollView>
-      <View style={styles.addQuestionBtn}>
-        <Pressable onPress={showModal}>
-          <Ionicons name="add-circle" size={26} color={Colors.black} />
-        </Pressable>
+        <AddQuestion
+          visible={addQuestionModalVisible}
+          hideModal={hideModal}
+          postDoneModal={postDoneModal}
+          setPostDoneModal={setPostDoneModal}
+        ></AddQuestion>
       </View>
-
-      <AddQuestion visible={addQuestionModalVisible} hideModal={hideModal}></AddQuestion>
-    </View>
     </Provider>
   );
 }
@@ -91,20 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const data = [
-  {
-    id: 1,
-    question: "السؤال الأول",
-    answer:
-      "نمببمتن منىبير منىري مىري منىي يمنبىيم منىبىمنىثب منيىبيىب منىةىيب منةىيب منةمنيب منةمنيىب منىيبمنىي منةمنيب منةىمنىيب منةىمنيب منةبمنيىب منةمىب منىمنىي مىيىي نةمنىب منةىمنىب منةىنمىب منةىنمىب نمنىب نةمنىب نةمنىبي منىمنىب نةنمىبي منىمنىيب ةمنشسمنى كمكسشةي كمنسكية كمةبيسش كمةبنةشسي كمةشسينب",
-  },
-  {
-    id: 2,
-    question: "السؤال الثاني",
-    answer:
-      "منبي نتبيمى منبىيتىب منىبيبى يتنىبيتىب منىبيىتب منىبيىب نتىبيتىب منىبيتىب ىبيىبي منىيتىبي مىتىيب متنىبيىب نىيتبي ىبيىتبي متنىببتيي منىبميى منىبيب مىبيىبي نةبيىبي الجواب الثاني",
-  },
-  { id: 3, question: "السؤال الثالث", answer: "الجواب الثالث" },
-  // ... add more questions and answers here
-];
 export default ForumPage;

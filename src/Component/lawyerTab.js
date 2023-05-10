@@ -2,17 +2,21 @@ import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "../color";
 
-function LawyerTab({handler}) {
+function LawyerTab({name,id ,address,city,image,handler}) {
+
+  const onPressNavigation = () =>{
+    handler(id);
+  }
   return (
-    <Pressable style={{width:'100%', alignItems:'center'}} onPress={handler}>
+    <Pressable style={{width:'100%', alignItems:'center'}} onPress={onPressNavigation}>
       <View style={styles.tab}>
         <Image
-          source={require("frontend/assets/myPic.png")}
+          source={image ? {uri:'http://192.168.1.13:3001/images/profile/'+image} : require("frontend/assets/user.png")}
           style={styles.tabImage}
         />
         <View style={{ paddingHorizontal: 5 }}>
-          <Text style={styles.tabTitle}>المحامي أحمد محمد</Text>
-          <Text>نابلس, شارع سفيان</Text>
+          <Text style={styles.tabTitle}>{'المحامي ' + name}</Text>
+          <Text>{city+','+address}</Text>
         </View>
       </View>
     </Pressable>

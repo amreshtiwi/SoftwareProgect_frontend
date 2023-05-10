@@ -17,6 +17,8 @@ function DropDownList({ setSelected }) {
             for (const key in result.data) {
                 data.push({ key, value: result.data[key] });
               }
+        }).catch( err => {
+          console.log('Promise rejected with error:', err);
         });
       }
     

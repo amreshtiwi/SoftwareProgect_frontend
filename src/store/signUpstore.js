@@ -24,7 +24,9 @@ export default function SignupFlow() {
         <Stack.Screen name="signUp1">
             {props => <SignUp1 {...props} onUserUpdate={handleUserUpdate}></SignUp1>}
         </Stack.Screen>
-        <Stack.Screen name="signUp2" component={SignUp2} />
+        <Stack.Screen name="signUp2">
+            {props => <SignUp2 {...props} onUserUpdate={handleUserUpdate}></SignUp2>}
+        </Stack.Screen>
         <Stack.Screen name="signUp3" component={SignUp3} />
       </Stack.Navigator>
       {/* <SignUp1 onUserUpdate={handleUserUpdate}></SignUp1> */}

@@ -3,11 +3,12 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import Colors from "../color";
 import * as ImagePicker from "expo-image-picker";
 import BottomSheetNavigation from "./bottomSheet";
+import { updateUserImage } from "../api/updateImageApi";
 
-function AddImage() {
+function AddImage({ image, setImage, edit = false, userId = "0" }) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [image, setImage] = useState(null);
+  // const [image, setImage] = useState(null);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
 
   const toggleBottomNavigationView = () => {
@@ -38,7 +39,24 @@ function AddImage() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      
+      if (edit) {
+        const formData = new FormData();
+        formData.append("profileImage", {
+          uri: result.assets[0].uri,
+          type: "image/jpeg", // Change this to the correct MIME type for your image
+          name: "userProfileImage.jpg",
+        });
+        console.log('userId image:',userId);
+        updateUserImage(formData, userId).then((result) => {
+          const myResult= result.data;
+          console.log("editImage :", myResult);
+          setImage(result.data.updatedImage.split("/")[5]);
+        }).catch(err => {console.log(err);});
+        
+      }else{
+        setImage(result.assets[0].uri);
+      }
       toggleBottomNavigationView();
     }
   };
@@ -52,7 +70,23 @@ function AddImage() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      if (edit) {
+        const formData = new FormData();
+        formData.append("profileImage", {
+          uri: result.assets[0].uri,
+          type: "image/jpeg", // Change this to the correct MIME type for your image
+          name: "userProfileImage.jpg",
+        });
+        console.log('userId image:',userId);
+        updateUserImage(formData, userId).then((result) => {
+          const myResult= result.data;
+          console.log("editImage :", myResult);
+          setImage(result.data.updatedImage.split("/")[5]);
+        }).catch(err => {console.log(err);});
+        
+      }else{
+        setImage(result.assets[0].uri);
+      }
       toggleBottomNavigationView();
     }
   };
@@ -77,7 +111,7 @@ function AddImage() {
                 textAlign: "center",
               }}
             >
-              إضافة صورة شخصية
+              {edit ? " تعديل الصورة الشخصية" : "إضافة صورة شخصية"}
             </Text>
           </View>
         </View>

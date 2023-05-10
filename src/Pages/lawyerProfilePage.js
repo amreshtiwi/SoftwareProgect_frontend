@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -13,14 +13,48 @@ import {
 import HeaderPages from "../Component/pagesHeader";
 import Colors from "../color";
 import { Entypo, FontAwesome, Ionicons, AntDesign } from "@expo/vector-icons";
-import { Divider } from "react-native-paper";
+
 import QuestionItem from "../Component/QustionItem";
+import { useIsFocused } from "@react-navigation/native";
+import { getUserApi } from "../api/getUserApi";
+import axios from "axios";
+import { Provider } from "react-native-paper";
 
-function LawyerProfilePage({ navigation, name }) {
+function LawyerProfilePage({ navigation, id }) {
   const scrollY = new Animated.Value(0);
+  const [lawyer, setLawyer] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // new state variable
+  const isFocused = useIsFocused();
 
-  const handleCallButtonPress = () => {
-    Linking.openURL("tel:1234567890");
+  useEffect(() => {
+    let isMounted = true;
+    let source = axios.CancelToken.source();
+    if (isFocused) {
+      setIsLoading(true); // set isLoading to true when API call starts
+
+      getUserApi(id)
+        .then((result) => {
+          if (isMounted) {
+            setLawyer(result.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setIsLoading(false); // set isLoading to false when API call completes
+        });
+    }
+
+    return () => {
+      isMounted = false;
+      source.cancel("Component unmounted");
+      // Cancel any ongoing API requests here
+    };
+  }, []);
+
+  const handleCallButtonPress = (mobile) => {
+    Linking.openURL("tel:"+mobile);
   };
   const back = () => {
     navigation.goBack();
@@ -28,131 +62,175 @@ function LawyerProfilePage({ navigation, name }) {
 
   const NavigatebookingPage = () => {
     navigation.navigate("BookingPage");
+  };
+
+  const navigateChat = () => {
+    navigation.navigate("chat",{lawyerEmail: lawyer.email});
   }
+
+  
   return (
-    <View style={styles.container}>
-      <Image source={require("../../assets/myPic.png")} style={styles.image} />
-      <View style={styles.bar}>
-        <HeaderPages
-          back={back}
-          label={"المحامي أحمد محمود"}
-          backgroundColor={null}
-        ></HeaderPages>
-      </View>
-
-      {/* <Animated.View></Animated.View> */}
-
-      <Animated.View
-        style={[
-          styles.contentContainer,
-          {
-            marginTop: scrollY.interpolate({
-              inputRange: [0, 250],
-              outputRange: [250, 0],
-              extrapolate: "clamp",
-            }),
-          },
-        ]}
-      >
-        <View style={styles.actionBar}>
-          <View style={styles.actionBtn}>
-            <Entypo name="chat" size={24} color={Colors.black} />
+    <Provider>
+      {isLoading ? (
+        <View style={styles.container}>
+          <View style={styles.bar}>
+            <HeaderPages label={"محامي"} back={back}></HeaderPages>
           </View>
-          <Pressable onPress={NavigatebookingPage}>
-          <View style={styles.actionBtn}>
-            <FontAwesome
-              name="calendar-plus-o"
-              size={24}
-              color={Colors.black}
-            />
-          </View>
-          </Pressable>
-          <View style={styles.actionBtn}>
-            <Ionicons
-              name="ios-location-sharp"
-              size={24}
-              color={Colors.black}
-            />
-          </View>
+          <Text>جاري التحميل...</Text>
         </View>
-        <View
-          style={{
-            width: "100%",
-            marginTop: 20,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View
-            style={[
-              styles.circleStyle,
-              { borderBottomStartRadius: 0, borderTopStartRadius: 0 },
-            ]}
-          ></View>
-          <View
-            style={[
-              styles.circleStyle,
-              { width: 35, borderBottomEndRadius: 0, borderTopEndRadius: 0 },
-            ]}
-          ></View>
+      ) : lawyer !== null ? (
+        <View style={styles.container}>
+          <Image
+            source={
+              lawyer.profile.userProfileImage ? {
+                    uri:
+                      'http://192.168.1.13:3001/images/profile/'+lawyer.profile.userProfileImage,
+                  }:
+                  require('../../assets/user.png')
 
-          <View style={{ position: "absolute", left: 50 }}>
-            <View style={[styles.infoContainer]}>
-              <View style={styles.infoIcon}>
-                <AntDesign name="user" size={24} color={Colors.black} />
+            }
+            style={styles.image}
+          />
+          <View style={styles.bar}>
+            <HeaderPages
+              back={back}
+              label={"المحامي " + lawyer.profile.name}
+              backgroundColor={null}
+            ></HeaderPages>
+          </View>
+
+          {/* <Animated.View></Animated.View> */}
+
+          <Animated.View
+            style={[
+              styles.contentContainer,
+              {
+                marginTop: scrollY.interpolate({
+                  inputRange: [0, 250],
+                  outputRange: [250, 0],
+                  extrapolate: "clamp",
+                }),
+              },
+            ]}
+          >
+            <View style={styles.actionBar}>
+              <Pressable onPress={navigateChat}>
+              <View style={styles.actionBtn}>
+                <Entypo name="chat" size={24} color={Colors.black} />
               </View>
-              <Text style={styles.infoText}>المحامي أحمد محمد</Text>
-            </View>
-
-            <View style={[styles.infoContainer]}>
-              <Pressable
-                onPress={handleCallButtonPress}
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <View style={styles.infoIcon}>
-                  <FontAwesome name="phone" size={24} color={Colors.black} />
-                </View>
-                <Text style={styles.infoText}>0595141904</Text>
               </Pressable>
-            </View>
-
-            <View style={[styles.infoContainer]}>
-              <View style={styles.infoIcon}>
+              <Pressable onPress={NavigatebookingPage}>
+                <View style={styles.actionBtn}>
+                  <FontAwesome
+                    name="calendar-plus-o"
+                    size={24}
+                    color={Colors.black}
+                  />
+                </View>
+              </Pressable>
+              <View style={styles.actionBtn}>
                 <Ionicons
                   name="md-location-sharp"
                   size={24}
                   color={Colors.black}
                 />
               </View>
-              <Text style={styles.infoText}>نابلس, شارع سفيان</Text>
             </View>
-          </View>
-        </View>
+            <View
+              style={{
+                width: "100%",
+                marginTop: 20,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={[
+                  styles.circleStyle,
+                  { borderBottomStartRadius: 0, borderTopStartRadius: 0 },
+                ]}
+              ></View>
+              <View
+                style={[
+                  styles.circleStyle,
+                  {
+                    width: 35,
+                    borderBottomEndRadius: 0,
+                    borderTopEndRadius: 0,
+                  },
+                ]}
+              ></View>
 
-        <View
-          style={{
-            height: Dimensions.get("window").height / 2,
-            marginTop: 10,
-            width: "100%",
-          }}
-        >
-          <ScrollView
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-              { useNativeDriver: false }
-            )}
-            style={{ width: "100%" }}
-          >
-            <View style={{alignItems:'center'}}>
-              {data.map((item) => {
-                return <QuestionItem key={item.id} item={item}></QuestionItem>;
-              })}
+              <View style={{ position: "absolute", left: 50 }}>
+                <View style={[styles.infoContainer]}>
+                  <View style={styles.infoIcon}>
+                    <AntDesign name="user" size={24} color={Colors.black} />
+                  </View>
+                  <Text style={styles.infoText}>
+                    {"المحامي " + lawyer.profile.name}
+                  </Text>
+                </View>
+
+                <View style={[styles.infoContainer]}>
+                  <Pressable
+                    onPress={() => handleCallButtonPress(lawyer.profile.mobile)}
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <View style={styles.infoIcon}>
+                      <FontAwesome
+                        name="phone"
+                        size={24}
+                        color={Colors.black}
+                      />
+                    </View>
+                    <Text style={styles.infoText}>{lawyer.profile.mobile}</Text>
+                  </Pressable>
+                </View>
+
+                <View style={[styles.infoContainer]}>
+                  <View style={styles.infoIcon}>
+                    <Entypo name="address" size={22} color={Colors.black} />
+                  </View>
+                  <Text style={styles.infoText}>
+                    {lawyer.profile.city + "," + lawyer.profile.address}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </ScrollView>
+
+            <View
+              style={{
+                height: Dimensions.get("window").height / 2,
+                marginTop: 10,
+                width: "100%",
+              }}
+            >
+              <ScrollView
+              
+                onScroll={Animated.event(
+                  [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                  { useNativeDriver: false }
+                )}
+                style={{ width: "100%" }}
+              >
+                <View style={{ alignItems: "center" }}>
+                  {data.map((item) => {
+                    return (
+                      <QuestionItem key={item.id} item={item}></QuestionItem>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            </View>
+          </Animated.View>
         </View>
-      </Animated.View>
-    </View>
+      ) : (
+        <View>
+          <Text>لا توجد معلومات</Text>
+        </View>
+      )}
+    </Provider>
   );
 }
 
@@ -176,12 +254,14 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   image: {
-    width: "100%",
+    // width: "100%",
+    width:'100%',
+    height: 700,
     position: "absolute",
     top: 0,
     // height: 200,
     // borderRadius: 200,
-    elevation: 10,
+    // elevation: 10,
   },
   actionBar: {
     flexDirection: "row",

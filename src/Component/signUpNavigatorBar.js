@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "../color";
 
-function SignUpNavigationBar({ pageNumber = 1 , goPage1,goPage2,goPage3}) {
+function SignUpNavigationBar({ pageNumber = 1, goPage1, goPage2, goPage3 }) {
   return (
     <View style={styles.bar}>
       <Pressable onPress={goPage1}>
@@ -14,7 +14,13 @@ function SignUpNavigationBar({ pageNumber = 1 , goPage1,goPage2,goPage3}) {
               : styles.pageBtnSizeNormal,
           ]}
         >
-          <Text style={styles.pageBtnTxt}>1</Text>
+          <Text
+            style={
+              pageNumber === 1 ? styles.pageBtnTxtSelected : styles.pageBtnTxt
+            }
+          >
+            1
+          </Text>
         </View>
       </Pressable>
       <Pressable onPress={goPage2}>
@@ -26,7 +32,13 @@ function SignUpNavigationBar({ pageNumber = 1 , goPage1,goPage2,goPage3}) {
               : styles.pageBtnSizeNormal,
           ]}
         >
-          <Text style={styles.pageBtnTxt}>2</Text>
+          <Text
+            style={
+              pageNumber === 2 ? styles.pageBtnTxtSelected : styles.pageBtnTxt
+            }
+          >
+            2
+          </Text>
         </View>
       </Pressable>
       <Pressable onPress={goPage3}>
@@ -38,7 +50,13 @@ function SignUpNavigationBar({ pageNumber = 1 , goPage1,goPage2,goPage3}) {
               : styles.pageBtnSizeNormal,
           ]}
         >
-          <Text style={styles.pageBtnTxt}>3</Text>
+          <Text
+            style={
+              pageNumber === 3 ? styles.pageBtnTxtSelected : styles.pageBtnTxt
+            }
+          >
+            3
+          </Text>
         </View>
       </Pressable>
     </View>
@@ -70,10 +88,14 @@ const styles = StyleSheet.create({
   pageBtnSizeSelected: {
     width: 35,
     height: 35,
+    backgroundColor: Colors.yellow,
     elevation: 10,
   },
   pageBtnTxt: {
     color: Colors.lightVanilla,
+  },
+  pageBtnTxtSelected: {
+    color: Colors.black,
   },
 });
 export default SignUpNavigationBar;

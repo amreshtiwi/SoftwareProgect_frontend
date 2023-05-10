@@ -11,10 +11,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { loginApi } from "../api/loginApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import App, { AuthContext } from "../../App";
+import { auth } from "../store/firebase";
 
 I18nManager.forceRTL(true);
 function LoginPage({ navigation }) {
@@ -22,12 +22,84 @@ function LoginPage({ navigation }) {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState(null);
+  const [loginCaution, setLoginCation] = useState(false);
 
-  const { authContext , loginCaution} = useContext(AuthContext);
+  useEffect(() => {
+    // Fetch the token from storage then navigate to our appropriate place
+    const bootstrapAsync = async () => {
+      let userToken;
+      // AsyncStorage.clear();
+      try {
+        userToken = await AsyncStorage.getItem("AccessToken");
+        console.log("token: ", userToken);
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            var uid = user.uid;
+            console.log('log in firebase Done')
+            // ...
+          } else {
+            // User is signed out
+            // ...
+            console.log('log in firebase faild')
+          }
+        });
+      } catch (e) {
+        // Restoring token failed
+        userToken = null;
+      }
+      setToken(userToken);
+
+      if(userToken !== null){
+        navigation.replace('drawer')
+      }
+    };
+
+
+      bootstrapAsync();
+  }, []);
 
   function signUpNavigation() {
     navigation.navigate("signUp");
   }
+
+  const logIn = async (data) => {
+    loginApi({
+        email: data.email.toLocaleLowerCase(),
+        password: data.password,
+      })
+        .then((result) => {
+          if (result.status == 200) {
+            AsyncStorage.setItem("userID", result.data.id.toString());
+
+            console.log("userID app.js : ", result.data.id.toString());
+
+            AsyncStorage.setItem("AccessToken", result.data.token);
+            setToken(result.data.token);
+
+            auth
+            .signInWithEmailAndPassword(data.email, data.password).then(
+              result =>{
+                console.log('fireBase log in Done by email and password');
+              }
+            )
+            .catch((error) => {
+              // var errorCode = error.code;
+              var errorMessage = error.message;
+              console.log("login firebase:", errorMessage);
+            });
+            navigation.replace('drawer');
+            setLoginCation(false);
+          } else {
+            setLoginCation(true);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+}
 
   return (
     <KeyboardAwareScrollView>
@@ -96,7 +168,6 @@ function LoginPage({ navigation }) {
             }}
           />
         </View>
-        {console.log(loginCaution)}
         {loginCaution  ? (
           <Text style={{ color: Colors.red }}>
             كلمة المرور أو البريد الإلكتروني غير صحيحة
@@ -113,7 +184,7 @@ function LoginPage({ navigation }) {
           </Pressable>
         </View>
         <Pressable
-          onPress={() => authContext.signIn({ email, password })}
+          onPress={() => logIn({ email, password })}
           style={[
             styles.Btn,
             { width: "100%", marginTop: 10, backgroundColor: Colors.darkGreen },

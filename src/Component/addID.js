@@ -4,8 +4,8 @@ import Colors from "../color";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
-function AddID() {
-  const [image, setImage] = useState(null);
+function AddID({image, setImage}) {
+  // const [image, setImage] = useState(null);
 
   const takePhoto = async () => {
     let result = await ImagePicker.launchCameraAsync({

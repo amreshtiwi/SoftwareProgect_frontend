@@ -14,6 +14,7 @@ import UserContext from "../context/signUpContext";
 
 function SignUp1({ navigation, onUserUpdate }) {
   const [caution, setCaution] = useState(false);
+  const [idNumberCaution, setIdNumberCaution] = useState(false);
   const [fullName, setFulName] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [birthdayString, setBirthdayString] = useState("");
@@ -24,6 +25,7 @@ function SignUp1({ navigation, onUserUpdate }) {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
 
+  const idNumberValidation = /^\d{9}$/;
   const user = useContext(UserContext);
 
   const back = () => {
@@ -32,22 +34,26 @@ function SignUp1({ navigation, onUserUpdate }) {
 
   const nextSignUp = () => {
     setCaution(false);
-    console.log("fullname:",fullName);
-    console.log("idNumber:",idNumber);
-    console.log("birthdayString:",birthdayString);
-    console.log("gender:",gender);
-    console.log("userRole:",userRole);
-    console.log("maritalStatus:",maritalStatus);
-    console.log("city:",city);
-    console.log("address:",address);
+    setIdNumberCaution(false);
+    const genderValue =  (gender == 'ذكر') ? '0':'1';
+    const roleValue = (userRole == 'محامي') ? '2' : '0';
 
-    if(!fullName&&!idNumber&&!birthdayString&&!gender&&!userRole&&!maritalStatus&&!city&&!address){
+
+    if(!fullName||!idNumber||!birthdayString||!gender||!userRole||!maritalStatus||!city||!address){
       setCaution(true);
     }else{
-      setCaution(false);
-      const updateUser = {...user,fullName,idNumber,birthdayDate,gender,userRole,maritalStatus,city,address};
-      onUserUpdate(updateUser);
-      navigation.navigate("signUp2");
+      if(idNumberValidation.test(idNumber)){
+        setCaution(false);
+        setIdNumberCaution(false);
+
+        const updateUser = {...user,fullName,idNumber,birthdayDate,genderValue,roleValue,maritalStatus,city,address};
+        console.log('update user:',updateUser);
+        onUserUpdate(updateUser);
+        navigation.navigate("signUp2");
+      }else{
+        setIdNumberCaution(true);
+      }
+
     }
     
   };
@@ -111,9 +117,9 @@ function SignUp1({ navigation, onUserUpdate }) {
             value={idNumber}
             onChangeText={(id) => {
               setIdNumber(id);
-              console.log("marital:", maritalStatus);
             }}
           ></Input>
+          {idNumberCaution ?  <Text style={{color:'red'}}>رقم الهوية يجب أن يتكون من 9 خانات</Text>:null}
           <SegmentedBtns
             firstValue="ذكر"
             firstIcon="human-male"

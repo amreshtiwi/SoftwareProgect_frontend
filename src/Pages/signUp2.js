@@ -1,12 +1,27 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../color";
 import SignUpNavigationBar from "../Component/signUpNavigatorBar";
 import Input from "../Component/input";
 import Btn from "../Component/button";
+import UserContext from "../context/signUpContext";
 
-function SignUp2({ navigation }) {
+function SignUp2({ navigation, onUserUpdate }) {
+  const [caution, setCaution] = useState(false);
+  const [emailCaution,setEmailCaution] = useState(false);
+  const [phoneNumberCaution, setPhoneNumberCaution] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [licenceNumber, setLicenceNumber] = useState("");
+
+  const emailValidation = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/;
+  const phoneNumberValidation =  /^(059|056)\d{7}$/;
+
+  const user = useContext(UserContext);
+  // console.log(user);
+
   const back = () => {
     navigation.navigate("signUp1");
   };
@@ -16,7 +31,30 @@ function SignUp2({ navigation }) {
   };
 
   const finalSignUp = () => {
-    navigation.navigate("signUp3");
+    setCaution(false);
+    setEmailCaution(false);
+    setPhoneNumberCaution(false);
+
+    if(!email||!phoneNumber||!password||(user.roleValue == '2' && !licenceNumber)){
+      setCaution(true);
+    }else{
+      if(emailValidation.test(email)){
+        if(phoneNumberValidation.test(phoneNumber)){
+          setCaution(false);
+          setEmailCaution(false);
+          setPhoneNumberCaution(false);
+  
+          const updateUser = {...user,email,password,phoneNumber,licenceNumber};
+          onUserUpdate(updateUser);
+          navigation.navigate("signUp3");
+        }else{
+          setPhoneNumberCaution(true);
+        }
+      }else{
+        setEmailCaution(true);
+      }
+    }
+    
   };
   return (
     <View style={styles.signUpPage}>
@@ -51,15 +89,52 @@ function SignUp2({ navigation }) {
       </View>
 
       <View style={styles.signUpContent}>
-        <SignUpNavigationBar pageNumber={2} goPage1={nextSignUp} goPage3={finalSignUp}></SignUpNavigationBar>
-        <Text style={[styles.title2,{paddingTop:30}]}> معلومات الحساب</Text>
-        <Input label="البريد الإلكتروني" keyboardType="email-address"></Input>
-        <Input label="رقم الجوال" keyboardType="numeric"></Input>
+        <SignUpNavigationBar
+          pageNumber={2}
+          goPage1={nextSignUp}
+          goPage3={finalSignUp}
+        ></SignUpNavigationBar>
+        <Text style={[styles.title2, { paddingTop: 30 }]}> معلومات الحساب</Text>
+        {caution ? <Text style={{color:'red'}}>يرجى ملئ جميع الخانات</Text> : <View></View>}
+        <Input
+          label="البريد الإلكتروني"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={(email) => {
+            setEmail(email);
+          }}
+        ></Input>
+        {emailCaution ? <Text style={{color:'red'}}>البريد الالكتروني غير متاح</Text> : <View></View>}
+        <Input
+          label="رقم الجوال"
+          keyboardType="numeric"
+          value={phoneNumber}
+          onChangeText={(phoneNumber) => {
+            setPhoneNumber(phoneNumber);
+          }}
+        ></Input>
+        {phoneNumberCaution ? <Text style={{color:'red'}}>رقم المحمول غير متاح</Text> : <View></View>}
+        {user.roleValue == "2" ? (
+          <Input
+            label={"رقم العضويه"}
+            value={licenceNumber}
+            onChangeText={(licenceNumber) => {
+              setLicenceNumber(licenceNumber);
+            }}
+          ></Input>
+        ) : null}
 
-        <Input label="كلمة المرور" isPassword={true}></Input>
-        <Input label="تأكيد كلمة المرور" isPassword={true}></Input>
+        <Input
+          label="كلمة المرور"
+          isPassword={true}
+          value={password}
+          onChangeText={(password) => {
+            setPassword(password);
+          }}
+        ></Input>
+        {/* <Input label="تأكيد كلمة المرور" isPassword={true}></Input> */}
 
-        <Btn value={'التالي'} handler={finalSignUp}></Btn>
+        <Btn value={"التالي"} handler={finalSignUp}></Btn>
       </View>
     </View>
   );
@@ -92,7 +167,7 @@ const styles = StyleSheet.create({
   title2: {
     fontSize: 18,
     color: Colors.black,
-    paddingVertical:10
+    paddingVertical: 10,
   },
   signUpContent: {
     width: "100%",

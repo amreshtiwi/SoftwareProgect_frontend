@@ -1,32 +1,51 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Colors from "../color";
+import { Divider } from "react-native-paper";
 
-function AgendaMeettings() {
-    
-  return (
+function AgendaMeettings({ date ,lawyer=false,agendaData}) {
 
-      <View style={styles.myAgenda}>
-        <Text style={styles.agendaText}>20-5-2023</Text>
-        <Text style={[styles.agendaText,{fontWeight:'bold'}]}>9:15 - 9:40</Text>
-      </View>
-
-  );
+  return agendaData.map((item) => {
+    if (item.date == date) {
+      return (
+        <View key={item.id} style={styles.myAgenda}>
+          <View style={{width:'40%',alignItems:'flex-start'}}>
+            <Text style={styles.agendaText}>{date}</Text>
+            <Text style={[styles.agendaText, { fontWeight: "bold", fontSize:9 }]}>
+              {item.startTime + ' - ' + item.endTime}
+            </Text>
+          </View>
+          <View style={styles.divider}></View>
+          <Text style={styles.agendaInfo}>{lawyer ? item.descrption : 'محجوز'}</Text>
+        </View>
+      );
+    }
+  });
 }
 
 const styles = StyleSheet.create({
   myAgenda: {
-    marginVertical:10,
+    marginVertical: 5,
     backgroundColor: Colors.lightVanilla1,
-    width:'90%',
-    borderRadius:10,
-    borderWidth:1,
-    borderColor:Colors.darkGreen,
-    
+    width: "90%",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.darkGreen,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation:5
   },
-  agendaText:{
-    marginVertical:3,
-    marginHorizontal:10
-  }
+  agendaText: {
+    marginVertical: 3,
+    marginHorizontal: 10,
+  },
+  agendaInfo: {
+    marginHorizontal: 20,
+  },
+  divider: {
+    backgroundColor: Colors.darkGreen,
+    width: 2,
+    height: "80%",
+  },
 });
 export default AgendaMeettings;

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Colors from "../color";
 import Header from "../Component/header";
 import HomeBtns from "../Component/HomeBtns";
@@ -8,17 +8,20 @@ import {
   Entypo,
   FontAwesome5,
   MaterialIcons,
+  MaterialCommunityIcons
 } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import { getUserApi } from "../api/getUserApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { updateUserApi } from "../api/updateUserApi";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+
 
 function HomePage({ navigation, user }) {
   const [latitude, setLatitude] = useState(user.latitude);
   const [longitude, setLongitude] = useState(user.longitude);
-
+  const [role, setRole] = useState(user.role);
   const navigateMapPage = () => {
     navigation.navigate("MapPage");
   };
@@ -26,12 +29,26 @@ function HomePage({ navigation, user }) {
   const navigateForumPage = () => {
     navigation.navigate("ForumPage");
   };
+  const navigateChatListPage =() => {
+    navigation.navigate("chatList")
+  }
 
   const navigateLawyerPage = () => {
     navigation.navigate("LawyerStack", {
       latitude: latitude,
-      longitude: longitude
+      longitude: longitude,
     });
+  };
+  const navigateTransactionPage = () => {
+    if (user.profile.accountIsActivated) {
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "لا يمكنك إجراء معاملة حتى يتم تثبيت الحساب",
+      });
+    }else{
+      navigation.navigate("transactionStack");
+    }
   };
 
   const getLocationPermission = async () => {
@@ -45,36 +62,55 @@ function HomePage({ navigation, user }) {
       accuracy: Location.Accuracy.Highest,
     });
 
-
     let editLocationObject = {};
     editLocationObject.latitude = currentLocation.coords.latitude;
     editLocationObject.longitude = currentLocation.coords.longitude;
 
-    updateUserApi(JSON.stringify(editLocationObject),user.id).then(result => {
-      console.log('updated:', result.data);
-      setLatitude(currentLocation.coords.latitude);
-      setLongitude(currentLocation.coords.longitude);
-  }).catch(err => {
-      console.log(err);
-  })
+    updateUserApi(JSON.stringify(editLocationObject), user.id)
+      .then((result) => {
+        console.log("updated:", result.data);
+        setLatitude(currentLocation.coords.latitude);
+        setLongitude(currentLocation.coords.longitude);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     getLocationPermission();
-  },[]);
+  }, []);
+
+
   return (
     <View style={styles.container}>
       <Header
         navigation={navigation}
         name={"أهلاً " + user.profile.name.split(" ")[0]}
       ></Header>
+      <ScrollView style={{width:'100%'}} contentContainerStyle={{ alignItems:'center'}}>
       <NewsCarousel></NewsCarousel>
       {latitude === null && longitude === null ? (
         <View style={styles.locationCaution}>
-          <View style={{flexDirection:'row'}}>
-            <Pressable onPress={() => {getLocationPermission().catch(err => {console.log(err);})}}><Text style={{color:Colors.darkGreen, fontWeight:'900'}}>إضغط</Text></Pressable>
+          <View style={{ flexDirection: "row" }}>
+            <Pressable
+              onPress={() => {
+                getLocationPermission().catch((err) => {
+                  console.log(err);
+                });
+              }}
+            >
+              <Text style={{ color: Colors.darkGreen, fontWeight: "900" }}>
+                إضغط
+              </Text>
+            </Pressable>
             <Text> لتحديد موقعك لإستفادة من خدمات الموقع</Text>
           </View>
+        </View>
+      ) : null}
+      {!user.profile.accountIsActivated ? (
+        <View style={styles.locationCaution}>
+          <Text>سوف يتم تثبيت حسابك قريباً</Text>
         </View>
       ) : null}
       <View style={styles.btnsContainer}>
@@ -82,26 +118,36 @@ function HomePage({ navigation, user }) {
           {" "}
           <FontAwesome name="map-marker" size={24} color={Colors.darkGreen} />
         </HomeBtns>
-        <HomeBtns label={"المعاملات"}>
+        {user.role === "BASIC" ? <HomeBtns label={"المعاملات"} handler={navigateTransactionPage}>
           {" "}
           <Entypo
             name="text-document-inverted"
             size={24}
             color={Colors.darkGreen}
           />
-        </HomeBtns>
-        <HomeBtns label={"المحامون"} handler={navigateLawyerPage}>
+        </HomeBtns> : null }
+        {user.role === "BASIC" ?<HomeBtns label={"المحامون"} handler={navigateLawyerPage}>
           <FontAwesome5
             name="balance-scale"
             size={24}
             color={Colors.darkGreen}
           />
-        </HomeBtns>
+        </HomeBtns> : null}
         <HomeBtns label={"المنتدى"} handler={navigateForumPage}>
+          {" "}
+          <MaterialCommunityIcons name="comment-quote" size={24} color={Colors.darkGreen} />
+        </HomeBtns>
+        <HomeBtns label={"المحادثات"} handler={navigateChatListPage}>
           {" "}
           <MaterialIcons name="forum" size={24} color={Colors.darkGreen} />
         </HomeBtns>
+
+        <HomeBtns label={"الحجوزات"} handler={navigateForumPage}>
+          {" "}
+          <Entypo name="bookmark" size={24} color={Colors.darkGreen} />
+        </HomeBtns>
       </View>
+      </ScrollView>
     </View>
   );
 }
@@ -129,8 +175,8 @@ const styles = StyleSheet.create({
     height: 35,
     borderColor: Colors.yellow,
     borderRadius: 20,
-    alignItems:'center',
-    justifyContent:'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 export default HomePage;

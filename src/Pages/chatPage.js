@@ -14,10 +14,10 @@ import HeaderPages from "../Component/pagesHeader";
 function ChatPage({navigation, route }) {
   const [messages, setMessages] = useState([]);
 
-  const { lawyerEmail } = route.params;
+  const { lawyerId , userId } = route.params;
 
   // set the chatroom ID
-  const chatroomId = lawyerEmail;
+  const chatroomId = [userId, lawyerId].sort().join("_");
 
   useLayoutEffect(() => {
     const unsubscribe = db
@@ -39,24 +39,40 @@ function ChatPage({navigation, route }) {
     return unsubscribe;
   }, [chatroomId]);
 
-  const onSend = useCallback(
-    (messages = []) => {
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, messages)
-      );
-
-      const { _id, createdAt, text, user } = messages[0];
-
-      // save the message to the chatroom
-      db.collection("chats").doc(chatroomId).collection("messages").add({
+  const onSend = useCallback((messages = []) => {
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
+    );
+  
+    const {
+      _id,
+      createdAt,
+      text,
+      user,
+    } = messages[0];
+  
+    // save the message to the chatroom
+    db.collection("chats")
+      .doc(chatroomId)
+      .collection("messages")
+      .add({
         _id,
         createdAt,
         text,
         user,
       });
-    },
-    [chatroomId]
-  );
+  
+    // save a reference to the chatroom in the chatrooms collection
+    db.collection("chatrooms")
+      .doc(chatroomId)
+      .set({
+        participants: [userId, lawyerId],
+        lastMessage: {
+          text,
+          createdAt,
+        },
+      });
+  }, [chatroomId]);
 
   const renderSend = (props) => {
     return (
@@ -97,7 +113,7 @@ function ChatPage({navigation, route }) {
   return (
     <>
       <View style={styles.bar}>
-        <HeaderPages label={"المنتدى"} back={back}></HeaderPages>
+        <HeaderPages label={"المحامي"} back={back}></HeaderPages>
       </View>
       <GiftedChat
         messages={messages}

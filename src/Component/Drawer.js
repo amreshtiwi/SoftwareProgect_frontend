@@ -4,10 +4,32 @@ import { Entypo, FontAwesome, Fontisto } from "@expo/vector-icons";
 
 import Colors from "../color";
 import { useNavigation } from "@react-navigation/native";
+import { logoutApi } from "../api/logoutApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function DrawerSideBar({user}) {
 
   const navigation = useNavigation();
+
+  const logout = () => {
+    logoutApi().then( result => {
+
+      const removeToken = async () => {
+        try {
+          await AsyncStorage.removeItem('AccessToken');
+          await AsyncStorage.removeItem('userID');
+          navigation.navigate('login');
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      removeToken();
+    }
+    ).catch( err => {
+      console.log(err);
+    })
+  }
   return (
     <View style={styles.container}>
       <View style={styles.imageNameContainer}>
@@ -37,7 +59,7 @@ function DrawerSideBar({user}) {
           <Text style={{ marginHorizontal: 20 }}>الإعدادات</Text>
           <Fontisto name="player-settings" size={24} color={Colors.darkGreen} />
         </Pressable>
-        <Pressable style={styles.drawerItem}>
+        <Pressable style={styles.drawerItem} onPress={logout}>
           <Text style={{ marginHorizontal: 20 }}>تسجيل الخروج</Text>
           <Entypo name="log-out" size={24} color={Colors.darkGreen} />
         </Pressable>

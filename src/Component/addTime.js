@@ -73,10 +73,14 @@ function AddTime({ visible, hideModal, date ,agendaData}) {
             }else{
                 setEndTimeConflict(false);
                 setEndTime(format(time, 'h:mm a'));
+                console.log("endTime time:",time);
+                console.log("endTime:",format(time, 'h:mm a'));
                 break;
             }
         }else{
             setEndTime(format(time, 'h:mm a'));
+            console.log("endTime time:",time);
+            console.log("endTime",format(time, 'h:mm a'));
         }
     }
     

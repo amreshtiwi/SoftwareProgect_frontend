@@ -17,6 +17,7 @@ import SearchInput from "../Component/searchInput";
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import { getAllPost } from "../api/getAllPostsApi";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 function ForumPage({ navigation, user }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +61,16 @@ function ForumPage({ navigation, user }) {
   }, [isFocused, postDoneModal, isSwitchOn]);
 
   const showModal = () => {
-    setAddQuestionModalVisible(true);
+    if(!user.profile.accountIsActivated){
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "لا يمكنك النشر حتى يتم تثبيت الحساب",
+      });
+    }else{
+      setAddQuestionModalVisible(true);
+    }
+    
   };
   const hideModal = () => {
     setAddQuestionModalVisible(false);
@@ -106,7 +116,7 @@ function ForumPage({ navigation, user }) {
               </View>
             ) : posts !== null ? (
               posts.map((item) => {
-                return <QuestionItem key={item.id} item={item}></QuestionItem>;
+                return <QuestionItem key={item.id} item={item} user={user}></QuestionItem>;
               })
             ) : (
               <View>

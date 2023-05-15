@@ -13,6 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginApi } from "./src/api/loginApi";
 import SignupFlow from "./src/store/signUpstore";
 import { auth } from "./src/store/firebase";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { BaseToast } from "react-native-toast-message";
 
 I18nManager.forceRTL(true);
 
@@ -22,6 +24,10 @@ const MyTheme = {
     ...DefaultTheme.colors,
     background: Colors.lightVanilla,
   },
+};
+
+const toastconfig = {
+  info: (props) => <BaseToast {...props} style={{ borderLeftColor: Colors.darkGreen }} />,
 };
 
 const Stack = createNativeStackNavigator();
@@ -45,6 +51,7 @@ export default function App() {
 
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast config={toastconfig}/>
     </>
   );
 }

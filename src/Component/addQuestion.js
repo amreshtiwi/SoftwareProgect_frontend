@@ -49,7 +49,7 @@ function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
         onDismiss={hideModal}
         contentContainerStyle={styles.modal}
       >
-        <Text>قم بإضافة سؤال وسيتم الرد عليك من قبل محامون مختصون.</Text>
+        <Text>قم بإضافة مشكلة أو سؤال وسيتم الرد عليك من قبل محامون مختصون.</Text>
         <Input
           label={"العنوان"}
           multiline={true}

@@ -33,19 +33,6 @@ function LoginPage({ navigation }) {
       try {
         userToken = await AsyncStorage.getItem("AccessToken");
         console.log("token: ", userToken);
-        auth.onAuthStateChanged((user) => {
-          if (user) {
-            // User is signed in, see docs for a list of available properties
-            // https://firebase.google.com/docs/reference/js/firebase.User
-            var uid = user.uid;
-            console.log('log in firebase Done')
-            // ...
-          } else {
-            // User is signed out
-            // ...
-            console.log('log in firebase faild')
-          }
-        });
       } catch (e) {
         // Restoring token failed
         userToken = null;

@@ -14,8 +14,12 @@ import FadedText from "./fadedText";
 import { ScrollView } from "react-native-gesture-handler";
 import Comment from "./comment";
 import { getUserApi } from "../api/getUserApi";
+import Input from "./input";
+import Btn from "./button";
+import { FontAwesome } from "@expo/vector-icons";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
-function QuestionItem({ item }) {
+function QuestionItem({ item ,user}) {
   const [visible, setVisble] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
 
@@ -40,6 +44,16 @@ function QuestionItem({ item }) {
   const hideModal = () => {
     setVisble(false);
   };
+
+  const addComment = () => {
+    if(!user.profile.accountIsActivated){
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المحامي",
+        text2: "لا يمكنك إضافة تعليق حتى يتم تثبيت الحساب",
+      });
+    }
+  }
   return (
     <>
       <Portal>
@@ -50,33 +64,43 @@ function QuestionItem({ item }) {
             contentContainerStyle={styles.modal}
           >
             <View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View style={styles.userInfo}>
-                  <Image
-                    source={
-                      userInfo.profile.userProfileImage
-                        ? {
-                            uri:
-                              "http://192.168.1.13:3001/images/profile/" +
-                              userInfo.profile.userProfileImage,
-                          }
-                        : require("../../assets/user.png")
-                    }
-                    style={styles.image}
-                  />
-                  <Text style={styles.userName}>{userInfo.profile.name}</Text>
-                </View>
-                <Text style={styles.qustionDate}>
+              
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View style={styles.userInfo}>
+                    <Image
+                      source={
+                        userInfo.profile.userProfileImage
+                          ? {
+                              uri:
+                                "http://192.168.1.13:3001/images/profile/" +
+                                userInfo.profile.userProfileImage,
+                            }
+                          : require("../../assets/user.png")
+                      }
+                      style={styles.image}
+                    />
+                    <Text style={styles.userName}>{userInfo.profile.name}</Text>
+                  </View>
+               
+                <Pressable onPress={hideModal}>
+                    <Text style={styles.closeModalText}>إغلاق</Text>
+                  </Pressable>
+                <Text
+                  style={[
+                    styles.qustionDate,
+                    { position: "absolute", right: 0, bottom: 0 },
+                  ]}
+                >
                   {getDays() == 0
                     ? "اليوم"
                     : getDays() == 1
                     ? "اليوم الماضي"
-                    : "أيام" + getDays() + "قبل "}
+                    : "قبل " + getDays() + " أيام"}
                 </Text>
               </View>
               <Divider style={styles.divider}></Divider>
@@ -91,8 +115,13 @@ function QuestionItem({ item }) {
                 <ScrollView>
                   <Comment></Comment>
                   <Comment></Comment>
-
                 </ScrollView>
+                {user.role === "LAWYER" ? <View style={styles.addComment}>
+                  <Input label={"إضافة تعليق"} width="88%"></Input>
+                  <Pressable style={styles.addCommentButton} onPress={addComment}>
+                    <FontAwesome name="send" size={20} color={Colors.black} />
+                  </Pressable>
+                </View> : null}
               </View>
             </View>
           </Modal>
@@ -106,7 +135,7 @@ function QuestionItem({ item }) {
               ? "اليوم"
               : getDays() == 1
               ? "اليوم الماضي"
-              : "أيام" + getDays() + "قبل "}
+              : "قبل " + getDays() + " أيام"}
           </Text>
         </View>
 
@@ -178,24 +207,25 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     maxHeight: 300,
   },
-  commentContainer: {
+  addComment: {
     flexDirection: "row",
-    width: "100%",
-    marginVertical: 10,
+    alignItems: "center",
+    // height:60,
+    // backgroundColor:Colors.lightVanilla1,
   },
-  commentImage: {
-    width: 25,
-    height: 25,
-    borderRadius: 30,
+  addCommentButton: {
+    width: "10%",
+    height: 45,
+    // backgroundColor:Colors.lightVanilla1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  comentTextContainer: {
-    backgroundColor: Colors.lightVanilla1,
-    width: "90%",
-    borderRadius: 20,
-  },
-  commentText: {
-    padding: 10,
-    fontSize: 14,
+  closeModalText: {
+    fontWeight: "bold",
+    color: Colors.darkGreen,
+    position: "absolute",
+    right: -10,
+    top: -10,
   },
 });
 export default QuestionItem;

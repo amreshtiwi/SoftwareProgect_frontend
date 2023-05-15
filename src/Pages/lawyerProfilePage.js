@@ -18,12 +18,15 @@ import QuestionItem from "../Component/QustionItem";
 import { useIsFocused } from "@react-navigation/native";
 import { getUserApi } from "../api/getUserApi";
 import axios from "axios";
-import { Provider } from "react-native-paper";
+import { ActivityIndicator, Provider } from "react-native-paper";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { getAllPost } from "../api/getAllPostsApi";
 
-function LawyerProfilePage({ navigation, id }) {
+function LawyerProfilePage({ navigation, id, user }) {
   const scrollY = new Animated.Value(0);
   const [lawyer, setLawyer] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // new state variable
+  const [lawyerPost , setLawyerPost ] = useState([]);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -36,6 +39,13 @@ function LawyerProfilePage({ navigation, id }) {
         .then((result) => {
           if (isMounted) {
             setLawyer(result.data);
+            getAllPost()
+            .then((result) => {
+              setLawyerPost(result.data.filter((item) => item.authorId == result.data.id));
+            })
+            .catch((err) => {
+              console.log(err);
+            })
           }
         })
         .catch((err) => {
@@ -51,24 +61,60 @@ function LawyerProfilePage({ navigation, id }) {
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
-  }, []);
+  }, [isFocused]);
 
   const handleCallButtonPress = (mobile) => {
-    Linking.openURL("tel:"+mobile);
+    Linking.openURL("tel:" + mobile);
   };
   const back = () => {
     navigation.goBack();
   };
 
   const NavigatebookingPage = () => {
-    navigation.navigate("BookingPage");
+    if (user.profile.accountIsActivated) {
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "لا يمكن حجز موعد حتى يتم تثبيت الحساب",
+      });
+    } else {
+      navigation.navigate("BookingPage");
+    }
   };
 
   const navigateChat = () => {
-    navigation.navigate("chat",{lawyerEmail: lawyer.email});
+    if (!user.profile.accountIsActivated) {
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "لا يمكن إجراء محادثة حتى يتم تثبيت الحساب",
+      });
+    } else {
+      navigation.navigate("chat", { lawyerId: lawyer.id , userId: user.id});
+    }
+  };
+
+  const navigateLawyerMap =() => {
+    if(lawyer.latitude === null || lawyer.longitude === null){
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "المحامي لم يحدد موقعه على الخريطة بعد",
+      });
+    }
+    else if(user.latitude === null || user.longitude === null){
+      Toast.show({
+        type: "info",
+        text1: "عزيزي المواطن",
+        text2: "يرجى تحديد موقعك على الخريطة",
+      });
+    }else {
+      navigation.navigate("lawyerMap" ,{
+        lawyerLatitude: lawyer.latitude, lawyerLongitude: lawyer.longitude ,lawyerName: lawyer.profile.name
+      });
+    }
   }
 
-  
   return (
     <Provider>
       {isLoading ? (
@@ -76,18 +122,21 @@ function LawyerProfilePage({ navigation, id }) {
           <View style={styles.bar}>
             <HeaderPages label={"محامي"} back={back}></HeaderPages>
           </View>
-          <Text>جاري التحميل...</Text>
+          <View>
+            <ActivityIndicator size="large" color={Colors.darkGreen} />
+          </View>
         </View>
       ) : lawyer !== null ? (
         <View style={styles.container}>
           <Image
             source={
-              lawyer.profile.userProfileImage ? {
+              lawyer.profile.userProfileImage
+                ? {
                     uri:
-                      'http://192.168.1.13:3001/images/profile/'+lawyer.profile.userProfileImage,
-                  }:
-                  require('../../assets/user.png')
-
+                      "http://192.168.1.13:3001/images/profile/" +
+                      lawyer.profile.userProfileImage,
+                  }
+                : require("../../assets/user.png")
             }
             style={styles.image}
           />
@@ -115,9 +164,9 @@ function LawyerProfilePage({ navigation, id }) {
           >
             <View style={styles.actionBar}>
               <Pressable onPress={navigateChat}>
-              <View style={styles.actionBtn}>
-                <Entypo name="chat" size={24} color={Colors.black} />
-              </View>
+                <View style={styles.actionBtn}>
+                  <Entypo name="chat" size={24} color={Colors.black} />
+                </View>
               </Pressable>
               <Pressable onPress={NavigatebookingPage}>
                 <View style={styles.actionBtn}>
@@ -128,13 +177,16 @@ function LawyerProfilePage({ navigation, id }) {
                   />
                 </View>
               </Pressable>
-              <View style={styles.actionBtn}>
-                <Ionicons
-                  name="md-location-sharp"
-                  size={24}
-                  color={Colors.black}
-                />
-              </View>
+
+              <Pressable onPress={navigateLawyerMap}>
+                <View style={styles.actionBtn}>
+                  <Ionicons
+                    name="md-location-sharp"
+                    size={24}
+                    color={Colors.black}
+                  />
+                </View>
+              </Pressable>
             </View>
             <View
               style={{
@@ -207,7 +259,6 @@ function LawyerProfilePage({ navigation, id }) {
               }}
             >
               <ScrollView
-              
                 onScroll={Animated.event(
                   [{ nativeEvent: { contentOffset: { y: scrollY } } }],
                   { useNativeDriver: false }
@@ -215,11 +266,12 @@ function LawyerProfilePage({ navigation, id }) {
                 style={{ width: "100%" }}
               >
                 <View style={{ alignItems: "center" }}>
-                  {data.map((item) => {
+                  
+                  {lawyerPost.length !== 0 ? lawyerPost.map((item) => {
                     return (
                       <QuestionItem key={item.id} item={item}></QuestionItem>
                     );
-                  })}
+                  }) : <Text>ليس هناك منشورات تخص المحامي</Text>}
                 </View>
               </ScrollView>
             </View>
@@ -255,7 +307,7 @@ const styles = StyleSheet.create({
   },
   image: {
     // width: "100%",
-    width:'100%',
+    width: "100%",
     height: 700,
     position: "absolute",
     top: 0,

@@ -13,12 +13,35 @@ import BookingPage from "../Pages/bookingPage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserApi } from "../api/getUserApi";
 import ChatPage from "../Pages/chatPage";
+import LawyerMap from "../Pages/lawyerMap";
+import ChatList from "../Pages/chatList";
+import { auth } from "../store/firebase";
+import TransactionPage from "../Pages/transactionPage";
+import CreateTransactionPage from "../Pages/createTransactionPage";
 
 const DrawerNavigator = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 const LawyerProfileStackNavigatior = createNativeStackNavigator();
+const transactionStack = createDrawerNavigator();
 
-const LawyerProfileStack = ({ route }) => {
+const TransactionStack = ({ user }) => {
+  return (
+    <transactionStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <transactionStack.Screen name="transaction" component={TransactionPage} />
+      <transactionStack.Screen
+        name="createTransaction"
+      >
+        {(props) => <CreateTransactionPage {...props} user={user} />}
+      </transactionStack.Screen>
+    </transactionStack.Navigator>
+  );
+};
+
+const LawyerProfileStack = ({ route, user }) => {
   const { id } = route.params;
   return (
     <LawyerProfileStackNavigatior.Navigator
@@ -27,18 +50,23 @@ const LawyerProfileStack = ({ route }) => {
       }}
     >
       <LawyerProfileStackNavigatior.Screen name="LawyerProfilePage">
-        {(props) => <LawyerProfilePage {...props} id={id} />}
+        {(props) => <LawyerProfilePage {...props} id={id} user={user} />}
       </LawyerProfileStackNavigatior.Screen>
       <LawyerProfileStackNavigatior.Screen
         name="BookingPage"
         component={BookingPage}
       />
-      <LawyerProfileStackNavigatior.Screen name="chat" component={ChatPage}/>
+      <LawyerProfileStackNavigatior.Screen name="chat" component={ChatPage} />
+      <LawyerProfileStackNavigatior.Screen
+        name="lawyerMap"
+        component={LawyerMap}
+      />
     </LawyerProfileStackNavigatior.Navigator>
   );
 };
-const LawyerStack = ({ route }) => {
-  const { latitude, longitude} = route.params;
+const LawyerStack = ({ route, user }) => {
+  const { latitude, longitude } = route.params;
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -50,7 +78,9 @@ const LawyerStack = ({ route }) => {
           <LawyersPage {...props} latitude={latitude} longitude={longitude} />
         )}
       </Stack.Screen>
-      <Stack.Screen name="LawyerProfileStack" component={LawyerProfileStack} />
+      <Stack.Screen name="LawyerProfileStack">
+        {(props) => <LawyerProfileStack {...props} user={user} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 };
@@ -67,6 +97,19 @@ function DrawerNavigation() {
           .then((result) => {
             // let firstName = result.data.profile.name.split(" ");
             setUser(result.data);
+            auth.onAuthStateChanged((user) => {
+              if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                var uid = user.uid;
+                console.log("log in firebase Done");
+                // ...
+              } else {
+                // User is signed out
+                // ...
+                console.log("log in firebase faild");
+              }
+            });
           })
           .catch((err) => {
             console.log(err);
@@ -98,10 +141,19 @@ function DrawerNavigation() {
           {(props) => <HomePage {...props} user={user} />}
         </DrawerNavigator.Screen>
         <DrawerNavigator.Screen name="MapPage" component={MapPage} />
-        <DrawerNavigator.Screen name="ForumPage"  >
+        <DrawerNavigator.Screen name="ForumPage">
           {(props) => <ForumPage {...props} user={user} />}
         </DrawerNavigator.Screen>
-        <DrawerNavigator.Screen name="LawyerStack" component={LawyerStack} />
+        <DrawerNavigator.Screen name="chatList">
+          {(props) => <ChatList {...props} user={user} />}
+        </DrawerNavigator.Screen>
+        <DrawerNavigator.Screen name="chat" component={ChatPage} />
+        <DrawerNavigator.Screen name="transactionStack">
+          {(props) => <TransactionStack {...props} user={user} />}
+        </DrawerNavigator.Screen>
+        <DrawerNavigator.Screen name="LawyerStack">
+          {(props) => <LawyerStack {...props} user={user} />}
+        </DrawerNavigator.Screen>
         <DrawerNavigator.Screen name="profile">
           {(props) => <ProfilePage {...props} user={user} />}
         </DrawerNavigator.Screen>

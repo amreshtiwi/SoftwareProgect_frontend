@@ -3,7 +3,7 @@ import { Platform, Pressable, Text, View } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Input from "./input";
 
-function DatePicker({value,setValue,setDate}) {
+function DatePicker({value,setValue,setDate,label='تاريخ الميلاد'}) {
   // const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
 
@@ -38,7 +38,7 @@ function DatePicker({value,setValue,setDate}) {
   return (
     <>
       <Pressable style={{ width: "100%" }} onPress={showPicker}>
-        <Input label={'تاريخ الميلاد'} disable={true} value={value}></Input>
+        <Input label={label} disable={true} value={value}></Input>
       </Pressable>
       <DateTimePickerModal isVisible={show} mode="date" onConfirm={handleConfirm} onCancel={hidePicker}/>
     </>

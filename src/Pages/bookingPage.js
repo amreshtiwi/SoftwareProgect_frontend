@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Button, Dimensions, StyleSheet } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
@@ -10,10 +10,18 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 import AddTime from "../Component/addTime";
 import { Provider } from "react-native-paper";
+import { getBookings } from "../api/getBooks";
 
 function BookingPage({ navigation }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [addTimeModalVisible, setAddTimeModalVisible] = useState(false);
+  const [agendaData,setAgendaData] = useState([]);
+
+  useEffect(() => {
+    getBookings().then(result => {
+      setAgendaData(result);
+    }).catch(err => {console.log(err);})
+  },[])
 
   const back = () => {
     navigation.goBack();
@@ -36,64 +44,64 @@ function BookingPage({ navigation }) {
     setAddTimeModalVisible(false);
   };
 
-  const agendaData = [
-    {
-      id: 1,
-      userName: "احمد محمد",
-      date: "2023-05-17",
-      startTime: "9:15 AM",
-      endTime: "9:40 AM",
-      descrption: "استشارة",
-    },
-    {
-      id: 2,
-      userName: "احمد محمد",
-      date: "2023-05-17",
-      startTime: "9:40 AM",
-      endTime: "10:40 AM",
-      descrption: "دفع ايجار",
-    },
-    {
-      id: 3,
-      userName: "احمد محمد",
-      date: "2023-05-17",
-      startTime: "11:10 AM",
-      endTime: "11:30 AM",
-      descrption: "توقيع عقد ايجار",
-    },
-    {
-      id: 4,
-      userName: "احمد محمد",
-      date: "2023-05-20",
-      startTime: "9:15 AM",
-      endTime: "9:40 AM",
-      descrption: "استشارة",
-    },
-    {
-      id: 5,
-      userName: "احمد محمد",
-      date: "2023-05-15",
-      startTime: "9:15 AM",
-      endTime: "9:40 AM",
-      descrption: "استشارة",
-    },
-    {
-      id: 6,
-      userName: "احمد محمد",
-      date: "2023-05-15",
-      startTime: "12:00 PM",
-      endTime: "1:00 PM",
-      descrption: "استشارة",
-    },
-    {
-      id: 7,
-      userName: "احمد محمد",
-      date: "2023-05-23",
-      startTime: "9:15 AM",
-      endTime: "9:40 AM",
-      descrption: "استشارة",
-    },
-  ];
+  // const agendaData = [
+  //   {
+  //     id: 1,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-17",
+  //     startTime: "9:15 AM",
+  //     endTime: "9:40 AM",
+  //     descrption: "استشارة",
+  //   },
+  //   {
+  //     id: 2,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-17",
+  //     startTime: "9:40 AM",
+  //     endTime: "10:40 AM",
+  //     descrption: "دفع ايجار",
+  //   },
+  //   {
+  //     id: 3,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-17",
+  //     startTime: "11:10 AM",
+  //     endTime: "11:30 AM",
+  //     descrption: "توقيع عقد ايجار",
+  //   },
+  //   {
+  //     id: 4,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-20",
+  //     startTime: "9:15 AM",
+  //     endTime: "9:40 AM",
+  //     descrption: "استشارة",
+  //   },
+  //   {
+  //     id: 5,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-15",
+  //     startTime: "9:15 AM",
+  //     endTime: "9:40 AM",
+  //     descrption: "استشارة",
+  //   },
+  //   {
+  //     id: 6,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-15",
+  //     startTime: "12:00 PM",
+  //     endTime: "1:00 PM",
+  //     descrption: "استشارة",
+  //   },
+  //   {
+  //     id: 7,
+  //     userName: "احمد محمد",
+  //     date: "2023-05-23",
+  //     startTime: "9:15 AM",
+  //     endTime: "9:40 AM",
+  //     descrption: "استشارة",
+  //   },
+  // ];
   LocaleConfig.locales["ar"] = {
     monthNames: [
       "يناير",

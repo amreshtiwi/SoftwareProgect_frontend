@@ -18,6 +18,7 @@ import ChatList from "../Pages/chatList";
 import { auth } from "../store/firebase";
 import TransactionPage from "../Pages/transactionPage";
 import CreateTransactionPage from "../Pages/createTransactionPage";
+import MyTransactionPage from "../Pages/myTransactionPage";
 
 const DrawerNavigator = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -36,6 +37,10 @@ const TransactionStack = ({ user }) => {
         name="createTransaction"
       >
         {(props) => <CreateTransactionPage {...props} user={user} />}
+      </transactionStack.Screen>
+
+      <transactionStack.Screen name="myTransaction">
+        {(props) => <MyTransactionPage {...props} user={user} />}
       </transactionStack.Screen>
     </transactionStack.Navigator>
   );

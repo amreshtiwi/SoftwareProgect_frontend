@@ -3,10 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import Colors from "../color";
 import { Divider } from "react-native-paper";
 
-function AgendaMeettings({ date ,lawyer=false,agendaData}) {
+function AgendaMeettings({ date,lawyerId, userId,lawyer=false,agendaData}) {
 
   return agendaData.map((item) => {
-    if (item.date == date) {
+    if ((item.date == date) && (item.lawyerId == lawyerId)) {
       return (
         <View key={item.id} style={styles.myAgenda}>
           <View style={{width:'40%',alignItems:'flex-start'}}>
@@ -16,7 +16,7 @@ function AgendaMeettings({ date ,lawyer=false,agendaData}) {
             </Text>
           </View>
           <View style={styles.divider}></View>
-          <Text style={styles.agendaInfo}>{lawyer ? item.descrption : 'محجوز'}</Text>
+          <Text style={styles.agendaInfo}>{lawyer || item.userId == userId ? item.description : 'محجوز'}</Text>
         </View>
       );
     }

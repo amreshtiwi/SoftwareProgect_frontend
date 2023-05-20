@@ -6,7 +6,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import Colors from "../color";
 import { maritalApi } from "../api/maritalApi";
 
-function DropDownList({ setSelected }) {
+function DropDownList({ setSelected ,type,placeholder ="الحالة الإجتماعية"}) {
 
   //   const [selected, setSelected] = React.useState("");
   const [data , setData] =useState([])
@@ -21,8 +21,25 @@ function DropDownList({ setSelected }) {
           console.log('Promise rejected with error:', err);
         });
       }
-    
+    if(type === 'TYPE1'){
+      setData([
+        { key: "0", value: "كمبياله" },
+        { key: "1", value: "شك" },
+      ])
+    }else if(type === 'TYPE2') {
+      setData([
+        { key: "0", value: "مبرئ للذمة" },
+        { key: "1", value: "غير مبرئ للذمة" },
+      ])
+    }else if (type === 'TYPE3'){
+      setData([
+        { key: "0", value: "اللجنة الطبية العليا" },
+        { key: "1", value: "اللجنة الطبية المحلية" },
+      ])
+    }else{
       getMaritalStatusValues();
+    }
+      
   },[])
 
 
@@ -48,7 +65,7 @@ function DropDownList({ setSelected }) {
           save="key"
           search={false}
           boxStyles={{ borderRadius: 5, borderWidth: 0 }}
-          placeholder="الحالة الإجتماعية"
+          placeholder={placeholder}
           dropdownStyles={{ borderColor: Colors.darkGreen }}
         />
       </View>

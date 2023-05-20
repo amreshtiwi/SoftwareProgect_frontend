@@ -29,7 +29,10 @@
         "googleMaps":{
           "apiKey":"AIzaSyDcSSSKrphyMer6I9R9QxWjDZO-dXdkOoo"
         }
-      }
+      },
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
+      "webviewLoader": "maven",
+      "package": "com.reactnativecommunity.webview.RNCWebViewPackage"
     },
     "web": {
       "favicon": "./assets/logo.png"

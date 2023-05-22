@@ -23,7 +23,10 @@ function HomePage({ navigation, user }) {
   const [longitude, setLongitude] = useState(user.longitude);
   const [role, setRole] = useState(user.role);
   const navigateMapPage = () => {
-    navigation.navigate("MapPage");
+    navigation.navigate("MapPage", {
+      userLatitude: latitude,
+      userLongitude: longitude,
+    });
   };
 
   const navigateForumPage = () => {

@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  View,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { Dimensions, View, StyleSheet, Pressable } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import Colors from "../color";
@@ -13,8 +8,13 @@ import MapViewDirections from "react-native-maps-directions";
 import { GOOGLE_MAPS_API_KEY } from "../constants";
 import HeaderPages from "../Component/pagesHeader";
 import { Entypo } from "@expo/vector-icons";
+import { getLawyersApi } from "../api/getLawyers";
+import { useIsFocused } from "@react-navigation/native";
+import axios from "axios";
+import { ActivityIndicator } from "react-native-paper";
 
-function MapPage({ navigation }) {
+function MapPage({ navigation, route }) {
+  const { userLatitude, userLongitude } = route.params;
   const [location, setLocation] = useState(null);
   const [region, setRegion] = useState({
     latitude: 32.813,
@@ -25,6 +25,10 @@ function MapPage({ navigation }) {
   const [markerCoordination, setMarkerCoordination] = useState(null);
   const [directionBtnVisible, setDirectionBtnVisible] = useState(false);
   const [direction, setDirection] = useState(false);
+  const [lawyers, setLawyers] = useState([]);
+  const [courts, setCourts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // new state variable
+  const isFocused = useIsFocused();
 
   const getLocationPermission = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -45,8 +49,6 @@ function MapPage({ navigation }) {
     });
   };
 
-
-
   const getCoordinate = (e) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
     setMarkerCoordination({ latitude, longitude });
@@ -62,49 +64,118 @@ function MapPage({ navigation }) {
   };
 
   useEffect(() => {
+    let isMounted = true;
+    let source = axios.CancelToken.source();
     getLocationPermission();
+    if (isFocused) {
+      setIsLoading(true);
+      console.log("lawyers before:", lawyers);
+
+      if (userLongitude !== null) {
+        const userLocation = {
+          location: {
+            longitude: userLongitude,
+            latidued: userLatitude,
+          },
+        };
+
+        getLawyersApi(JSON.stringify(userLocation))
+          .then((result) => {
+            if (isMounted) {
+              const haveLocation = result.data.filter((item) => {
+                if (item.latitude !== null && item.longitude !== null) {
+                  return item;
+                }
+              });
+
+              console.log("filterd:", haveLocation);
+              const LawyersLocation = haveLocation.map((item) => {
+                return {
+                  coordinate: {
+                    lat: item.latitude,
+                    lng: item.longitude,
+                  },
+                  title: "محامي",
+                  description: item.profile.name,
+                };
+              });
+              console.log("mapped:", LawyersLocation);
+              setLawyers(LawyersLocation);
+              console.log("setting Done");
+            }
+          })
+          .catch((err) => console.log(err))
+          .finally(() => {
+            setIsLoading(false);
+            console.log("lawyer after:", lawyers);
+          });
+      }
+    }
+    return () => {
+      isMounted = false;
+      source.cancel("Component unmounted");
+      // Cancel any ongoing API requests here
+    };
   }, []);
 
   return (
     <View style={{ alignItems: "center" }}>
-      <MapView
-        style={{
-          height: Dimensions.get("window").height,
-          width: Dimensions.get("window").width,
-        }}
-        onPress={() => {
-          setDirectionBtnVisible(false);
-          setDirection(false);
-        }}
-        region={region}
-        showsUserLocation={true}
-        showsScale={true}
-        showsCompass={true}
-        showsMyLocationButton={true}
-        provider={PROVIDER_GOOGLE}
-      >
-        <Marker
-          coordinate={{ latitude: 32.23669, longitude: 35.21885 }}
-          title="محكمه"
-          description="محكمة بداية وصلح نابلس"
-          pinColor={Colors.darkGreen}
-          icon={require("frontend/assets/court.png")}
-          onPress={getCoordinate}
-        />
-        {direction && location !== null ? (
-          <MapViewDirections
-            origin={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            destination={markerCoordination}
-            apikey={GOOGLE_MAPS_API_KEY}
-            strokeWidth={4}
-            strokeColor={Colors.darkGreen}
-          />
-        ) : null}
-      </MapView>
-
+      {isLoading ? (
+        <ActivityIndicator size="large" color={Colors.darkGreen} />
+      ) : (
+        <MapView
+          style={{
+            height: Dimensions.get("window").height,
+            width: Dimensions.get("window").width,
+          }}
+          onPress={() => {
+            setDirectionBtnVisible(false);
+            setDirection(false);
+          }}
+          region={region}
+          showsUserLocation={true}
+          showsScale={true}
+          showsCompass={true}
+          showsMyLocationButton={true}
+          provider={PROVIDER_GOOGLE}
+        >
+          {lawyers.length > 0
+            ? lawyers.map((item, index) => {
+              console.log('this is map item inside Map:',item);
+              return(
+                <Marker
+                  key={index}
+                  coordinate={{latitude: item.coordinate.lat, longitude:item.coordinate.lng}}
+                  // title={item.title}
+                  // description={item.description}
+                  pinColor={Colors.darkGreen}
+                  icon={require("frontend/assets/binance.png")}
+                  onPress={getCoordinate}
+                />);
+              })
+            : null}
+          {/* <Marker
+            coordinate={{ latitude: 32.23669, longitude: 35.21885 }}
+            title="محكمه"
+            description="محكمة بداية وصلح نابلس"
+            pinColor={Colors.darkGreen}
+            icon={require("frontend/assets/court.png")}
+            onPress={getCoordinate}
+          /> */}
+          {direction && location !== null ? (
+            <MapViewDirections
+              origin={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              destination={markerCoordination}
+              apikey={GOOGLE_MAPS_API_KEY}
+              strokeWidth={4}
+              strokeColor={Colors.darkGreen}
+            />
+          ) : null}
+        </MapView>
+      )}
       <View style={styles.bar}>
         <HeaderPages
           back={back}
@@ -118,9 +189,7 @@ function MapPage({ navigation }) {
           }}
         >
           <Pressable onPress={getLocationPermission}>
-            <View
-              style={styles.myLocationBtn}
-            >
+            <View style={styles.myLocationBtn}>
               <Entypo name="location" size={24} color={Colors.black} />
             </View>
           </Pressable>
@@ -151,7 +220,7 @@ const styles = StyleSheet.create({
     top: 0,
     alignItems: "center",
   },
-  myLocationBtn:{
+  myLocationBtn: {
     width: 50,
     height: 50,
     margin: 10,
@@ -159,6 +228,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
 });
 export default MapPage;

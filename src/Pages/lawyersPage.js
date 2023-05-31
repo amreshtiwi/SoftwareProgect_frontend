@@ -15,6 +15,7 @@ import axios from "axios";
 import { useIsFocused } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 import Colors from "../color";
+import { searchUsers } from "../api/searchusers";
 
 function LawyersPage({ navigation, latitude, longitude }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,26 +35,42 @@ function LawyersPage({ navigation, latitude, longitude }) {
         },
       };
 
-      getLawyersApi(JSON.stringify(locationObject))
-        .then((result) => {
-          if (isMounted) {
-            setAllLawyers(result.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          setIsLoading(false); // set isLoading to false when API call completes
-        });
+      if (searchQuery.trim() === "") {
+        getLawyersApi(JSON.stringify(locationObject))
+          .then((result) => {
+            if (isMounted) {
+              setAllLawyers(result.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setIsLoading(false); // set isLoading to false when API call completes
+          });
+      } else {
+        setTimeout(() => {
+          searchUsers(searchQuery, "LAWYER")
+            .then((result) => {
+              if (isMounted) {
+                setAllLawyers(result.data);
+              }
+            })
+            .catch((err) => console.log(err))
+            .finally(() => {
+              setIsLoading(false); // set isLoading to false when API call completes
+            });
+        }, 500);
+      }
     }
 
     return () => {
+      clearTimeout();
       isMounted = false;
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
-  }, [isFocused]);
+  }, [isFocused, searchQuery]);
 
   const onChangeSearch = (query) => {
     setSearchQuery(query);
@@ -79,19 +96,19 @@ function LawyersPage({ navigation, latitude, longitude }) {
           <HeaderPages label={"المحامون"} back={back}></HeaderPages>
         </View>
 
+        <View>
+          <SearchInput
+            searchQuery={searchQuery}
+            onChangeSearch={onChangeSearch}
+          ></SearchInput>
+        </View>
+
         {isLoading ? (
           <ActivityIndicator size="large" color={Colors.darkGreen} />
         ) : allLawyers.length === 0 ? (
           <Text>ليس هناك محاميين بعد</Text>
         ) : (
           <>
-            <View>
-              <SearchInput
-                searchQuery={searchQuery}
-                onChangeSearch={onChangeSearch}
-              ></SearchInput>
-            </View>
-
             <View style={{ alignItems: "center", width: "100%" }}>
               {allLawyers.map((items) => {
                 return (
@@ -118,7 +135,7 @@ const styles = StyleSheet.create({
   bar: {
     width: Dimensions.get("window").width,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 0,
   },
 });
 export default LawyersPage;

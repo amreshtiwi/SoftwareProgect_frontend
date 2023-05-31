@@ -5,10 +5,20 @@ import Colors from "../color";
 import Input from "./input";
 import Btn from "./button";
 import { createPost } from "../api/createPostApi";
+import { updatePost } from "../api/updatePost";
 
-function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+function AddQuestion({
+  visible,
+  hideModal,
+  postDoneModal,
+  setPostDoneModal,
+  update = false,
+  updateTitle = "",
+  updateDescrption = "",
+  id = 0,
+}) {
+  const [title, setTitle] = useState(updateTitle);
+  const [description, setDescription] = useState(updateDescrption);
   const [caution, setCaution] = useState(false);
 
   const addQustion = () => {
@@ -18,19 +28,41 @@ function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
         title: title,
         description: description,
       };
-      createPost(JSON.stringify(postObject))
-        .then((result) => {
-          setPostDoneModal(true);
-          setTitle("");
-          setDescription("");
-          hideModal();
-          setTimeout(() => {
-            setPostDoneModal(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+
+      if (update) {
+        console.log(update);
+        updatePost(
+          JSON.stringify({
+            title: title,
+            description: description,
+          }),
+          id
+        )
+          .then((result) => {
+            setPostDoneModal(true);
+            setTitle("");
+            setDescription("");
+            hideModal();
+            setTimeout(() => {
+              setPostDoneModal(false);
+            }, 1500);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        createPost(JSON.stringify(postObject))
+          .then((result) => {
+            setPostDoneModal(true);
+            setTitle("");
+            setDescription("");
+            hideModal();
+            setTimeout(() => {
+              setPostDoneModal(false);
+            }, 1500);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     } else {
       setCaution(true);
     }
@@ -41,7 +73,7 @@ function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
         visible={postDoneModal}
         contentContainerStyle={[styles.modal, { alignItems: "center" }]}
       >
-        <Text>تم نشر سؤالك</Text>
+        {update ? <Text>تم تعديل سؤالك</Text> : <Text>تم نشر سؤالك</Text>}
       </Modal>
 
       <Modal
@@ -49,7 +81,9 @@ function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
         onDismiss={hideModal}
         contentContainerStyle={styles.modal}
       >
-        <Text>قم بإضافة مشكلة أو سؤال وسيتم الرد عليك من قبل محامون مختصون.</Text>
+        <Text>
+          قم بإضافة مشكلة أو سؤال وسيتم الرد عليك من قبل محامون مختصون.
+        </Text>
         <Input
           label={"العنوان"}
           multiline={true}
@@ -70,7 +104,7 @@ function AddQuestion({ visible, hideModal, postDoneModal, setPostDoneModal }) {
           <Text style={{ color: "red" }}>يرجى تعبئة جميع الفراغات</Text>
         ) : null}
 
-        <Btn value={"نشر"} handler={addQustion}></Btn>
+        <Btn value={update ? "نعديل" : "نشر"} handler={addQustion}></Btn>
       </Modal>
     </Portal>
   );

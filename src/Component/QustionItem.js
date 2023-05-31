@@ -18,10 +18,22 @@ import Input from "./input";
 import Btn from "./button";
 import { FontAwesome } from "@expo/vector-icons";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuProvider,
+  MenuTrigger,
+} from "react-native-popup-menu";
+import { Entypo } from "@expo/vector-icons";
+import { deletePost } from "../api/deletePostApi";
+import AddQuestion from "./addQuestion";
 
-function QuestionItem({ item ,user}) {
+function QuestionItem({ item, user, refersh, handleRefresh }) {
   const [visible, setVisble] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [updateModalVisibale, setUpdateModalVisible] = useState(false);
+  const [postDoneModal, setPostDoneModal] = useState(false);
 
   const getDays = () => {
     const qustionDate = new Date(item.created);
@@ -46,16 +58,55 @@ function QuestionItem({ item ,user}) {
   };
 
   const addComment = () => {
-    if(!user.profile.accountIsActivated){
+    if (!user.profile.accountIsActivated) {
       Toast.show({
         type: "info",
         text1: "عزيزي المحامي",
         text2: "لا يمكنك إضافة تعليق حتى يتم تثبيت الحساب",
       });
     }
-  }
+  };
+
+  const handleDeletePost = () => {
+    deletePost(item.id)
+      .then((result) => {
+        console.log(result.data);
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        hideModal();
+        handleRefresh(!refersh);
+        Toast.show({
+          type: "info",
+          text1: "عزيزي المواطن",
+          text2: "تم حذف السؤال بنجاح",
+        });
+      });
+  };
+
+  const hideUpdateModal = () => {
+    setUpdateModalVisible(false);
+    setVisble(true);
+  };
+
+  const showUpdateModal = () => {
+    setUpdateModalVisible(true);
+    setVisble(false);
+  };
+
+
+
   return (
     <>
+      <AddQuestion
+        visible={updateModalVisibale}
+        hideModal={hideUpdateModal}
+        postDoneModal={postDoneModal}
+        setPostDoneModal={setPostDoneModal}
+        update={true}
+        updateTitle={item.title}
+        updateDescrption={item.description}
+      ></AddQuestion>
       <Portal>
         {userInfo ? (
           <Modal
@@ -64,32 +115,31 @@ function QuestionItem({ item ,user}) {
             contentContainerStyle={styles.modal}
           >
             <View>
-              
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={styles.userInfo}>
-                    <Image
-                      source={
-                        userInfo.profile.userProfileImage
-                          ? {
-                              uri:
-                                "http://192.168.1.13:3001/images/profile/" +
-                                userInfo.profile.userProfileImage,
-                            }
-                          : require("../../assets/user.png")
-                      }
-                      style={styles.image}
-                    />
-                    <Text style={styles.userName}>{userInfo.profile.name}</Text>
-                  </View>
-               
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <View style={styles.userInfo}>
+                  <Image
+                    source={
+                      userInfo.profile.userProfileImage
+                        ? {
+                            uri:
+                              "http://192.168.1.13:3001/images/profile/" +
+                              userInfo.profile.userProfileImage,
+                          }
+                        : require("../../assets/user.png")
+                    }
+                    style={styles.image}
+                  />
+                  <Text style={styles.userName}>{userInfo.profile.name}</Text>
+                </View>
+
                 <Pressable onPress={hideModal}>
-                    <Text style={styles.closeModalText}>إغلاق</Text>
-                  </Pressable>
+                  <Text style={styles.closeModalText}>إغلاق</Text>
+                </Pressable>
                 <Text
                   style={[
                     styles.qustionDate,
@@ -106,6 +156,32 @@ function QuestionItem({ item ,user}) {
               <Divider style={styles.divider}></Divider>
 
               <View>
+        
+                {user.id === userInfo.id  ? (
+                  <Menu>
+                    <MenuTrigger
+                              customStyles={{
+                                triggerWrapper: {
+                                  top: 0,
+                                  right:0,
+                                },
+                              }}>
+                      <Entypo
+                        name="dots-three-vertical"
+                        size={18}
+                        color="grey"
+                      />
+                    </MenuTrigger>
+                    <MenuOptions style={styles.menuOptions}>
+                      <MenuOption
+                        style={styles.menuOption}
+                        onSelect={showUpdateModal}
+                        text="تعديل"
+                      />
+                      <MenuOption onSelect={handleDeletePost} text="حذف" />
+                    </MenuOptions>
+                  </Menu>
+                ) : null}
                 <Text style={styles.questionText}>{item.title}</Text>
                 <Text>{item.description}</Text>
               </View>
@@ -113,15 +189,25 @@ function QuestionItem({ item ,user}) {
               <View style={styles.comments}>
                 <Text>التعليقات</Text>
                 <ScrollView>
-                  <Comment></Comment>
-                  <Comment></Comment>
+                  {item.comments.map((comment, index) => {
+                    return (
+                      <Comment key={index} commentValue={comment}></Comment>
+                    );
+                  })}
+                  {/* <Comment ></Comment>
+                  <Comment></Comment> */}
                 </ScrollView>
-                {user.role === "LAWYER" ? <View style={styles.addComment}>
-                  <Input label={"إضافة تعليق"} width="88%"></Input>
-                  <Pressable style={styles.addCommentButton} onPress={addComment}>
-                    <FontAwesome name="send" size={20} color={Colors.black} />
-                  </Pressable>
-                </View> : null}
+                {user.role === "LAWYER" ? (
+                  <View style={styles.addComment}>
+                    <Input label={"إضافة تعليق"} width="88%"></Input>
+                    <Pressable
+                      style={styles.addCommentButton}
+                      onPress={addComment}
+                    >
+                      <FontAwesome name="send" size={20} color={Colors.black} />
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
             </View>
           </Modal>

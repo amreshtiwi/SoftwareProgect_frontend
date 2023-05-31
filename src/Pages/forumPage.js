@@ -18,6 +18,7 @@ import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import { getAllPost } from "../api/getAllPostsApi";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { MenuProvider } from "react-native-popup-menu";
 
 function ForumPage({ navigation, user }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +27,7 @@ function ForumPage({ navigation, user }) {
   const [isLoading, setIsLoading] = useState(true);
   const [postDoneModal, setPostDoneModal] = useState(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
+  const [refersh, setRefersh] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -58,7 +60,7 @@ function ForumPage({ navigation, user }) {
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
-  }, [isFocused, postDoneModal, isSwitchOn]);
+  }, [isFocused, postDoneModal, isSwitchOn, refersh]);
 
   const showModal = () => {
     if(!user.profile.accountIsActivated){
@@ -83,7 +85,16 @@ function ForumPage({ navigation, user }) {
   };
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+
+  const handleRefersh = (refersh) => {
+    setRefersh(refersh);
+  };
+
+  const handleEdit = (title, description) => {
+    
+  }
   return (
+    <MenuProvider>
     <Provider>
       <View style={{ flex: 1 }}>
         <ScrollView
@@ -116,7 +127,7 @@ function ForumPage({ navigation, user }) {
               </View>
             ) : posts !== null ? (
               posts.map((item) => {
-                return <QuestionItem key={item.id} item={item} user={user}></QuestionItem>;
+                return <QuestionItem key={item.id} item={item} user={user} refersh={refersh} handleRefresh={handleRefersh}></QuestionItem>;
               })
             ) : (
               <View>
@@ -139,6 +150,7 @@ function ForumPage({ navigation, user }) {
         ></AddQuestion>
       </View>
     </Provider>
+    </MenuProvider>
   );
 }
 

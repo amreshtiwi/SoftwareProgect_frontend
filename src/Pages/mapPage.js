@@ -12,6 +12,7 @@ import { getLawyersApi } from "../api/getLawyers";
 import { useIsFocused } from "@react-navigation/native";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
+import { getAllCourts } from "../api/getAllCourts";
 
 function MapPage({ navigation, route }) {
   const { userLatitude, userLongitude } = route.params;
@@ -82,6 +83,12 @@ function MapPage({ navigation, route }) {
         getLawyersApi(JSON.stringify(userLocation))
           .then((result) => {
             if (isMounted) {
+              getAllCourts()
+              .then((result) => {
+                setCourts(result.data);
+              })
+              .catch((err) => console.log("error in courts API", err));
+
               const haveLocation = result.data.filter((item) => {
                 if (item.latitude !== null && item.longitude !== null) {
                   return item;
@@ -104,7 +111,7 @@ function MapPage({ navigation, route }) {
               console.log("setting Done");
             }
           })
-          .catch((err) => console.log(err))
+          .catch((err) => console.log("error in lawyer api", err))
           .finally(() => {
             setIsLoading(false);
             console.log("lawyer after:", lawyers);
@@ -116,6 +123,10 @@ function MapPage({ navigation, route }) {
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
+  }, []);
+
+  useEffect(() => {
+
   }, []);
 
   return (
@@ -141,17 +152,39 @@ function MapPage({ navigation, route }) {
         >
           {lawyers.length > 0
             ? lawyers.map((item, index) => {
-              console.log('this is map item inside Map:',item);
-              return(
-                <Marker
-                  key={index}
-                  coordinate={{latitude: item.coordinate.lat, longitude:item.coordinate.lng}}
-                  // title={item.title}
-                  // description={item.description}
-                  pinColor={Colors.darkGreen}
-                  icon={require("frontend/assets/binance.png")}
-                  onPress={getCoordinate}
-                />);
+                console.log("this is map item inside Map:", item);
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: item.coordinate.lat,
+                      longitude: item.coordinate.lng,
+                    }}
+                    // title={item.title}
+                    // description={item.description}
+                    pinColor={Colors.darkGreen}
+                    icon={require("frontend/assets/binance.png")}
+                    onPress={getCoordinate}
+                  />
+                );
+              })
+            : null}
+          {courts.length > 0
+            ? courts.map((item, index) => {
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: item.latitude,
+                      longitude: item.longitude,
+                    }}
+                    title={item.name}
+                    description={item.address}
+                    pinColor={Colors.darkGreen}
+                    icon={require("frontend/assets/court.png")}
+                    onPress={getCoordinate}
+                  />
+                );
               })
             : null}
           {/* <Marker

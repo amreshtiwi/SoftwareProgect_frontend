@@ -153,6 +153,7 @@ function DrawerNavigation() {
           {(props) => <ChatList {...props} user={user} />}
         </DrawerNavigator.Screen>
         <DrawerNavigator.Screen name="chat" component={ChatPage} />
+        <DrawerNavigator.Screen name="userBookings" component={BookingPage}/>
         <DrawerNavigator.Screen name="transactionStack">
           {(props) => <TransactionStack {...props} user={user} />}
         </DrawerNavigator.Screen>
@@ -162,6 +163,7 @@ function DrawerNavigation() {
         <DrawerNavigator.Screen name="profile">
           {(props) => <ProfilePage {...props} user={user} />}
         </DrawerNavigator.Screen>
+        
       </DrawerNavigator.Navigator>
     );
   } else {

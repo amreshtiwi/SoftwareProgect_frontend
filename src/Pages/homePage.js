@@ -8,7 +8,7 @@ import {
   Entypo,
   FontAwesome5,
   MaterialIcons,
-  MaterialCommunityIcons
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import { getUserApi } from "../api/getUserApi";
@@ -16,12 +16,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { updateUserApi } from "../api/updateUserApi";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-
+import { useIsFocused } from "@react-navigation/native";
+import axios from "axios";
+import { getAllBooks } from "../api/getAllbookings";
 
 function HomePage({ navigation, user }) {
   const [latitude, setLatitude] = useState(user.latitude);
   const [longitude, setLongitude] = useState(user.longitude);
   const [role, setRole] = useState(user.role);
+  const [bookings, setBookings] = useState(false);
+
+  const isFocused = useIsFocused();
   const navigateMapPage = () => {
     navigation.navigate("MapPage", {
       userLatitude: latitude,
@@ -32,9 +37,14 @@ function HomePage({ navigation, user }) {
   const navigateForumPage = () => {
     navigation.navigate("ForumPage");
   };
-  const navigateChatListPage =() => {
-    navigation.navigate("chatList")
-  }
+
+  const navigateBookingPage = () => {
+    navigation.navigate("userBookings",{Bookings:bookings , id: "0", user: user});
+  };
+
+  const navigateChatListPage = () => {
+    navigation.navigate("chatList");
+  };
 
   const navigateLawyerPage = () => {
     navigation.navigate("LawyerStack", {
@@ -43,13 +53,13 @@ function HomePage({ navigation, user }) {
     });
   };
   const navigateTransactionPage = () => {
-    if (user.profile.accountIsActivated) {
+    if (!user.profile.accountIsActivated) {
       Toast.show({
         type: "info",
         text1: "عزيزي المواطن",
         text2: "لا يمكنك إجراء معاملة حتى يتم تثبيت الحساب",
       });
-    }else{
+    } else {
       navigation.navigate("transactionStack");
     }
   };
@@ -82,8 +92,29 @@ function HomePage({ navigation, user }) {
 
   useEffect(() => {
     getLocationPermission();
-  }, []);
+  },[]);
+  
+  useEffect(() => {
+    let isMounted = true;
+    let source = axios.CancelToken.source();
+    if (isFocused) {
+      getAllBooks()
+        .then((result) => {
+          if (isMounted) {
+            setBookings(result.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
 
+    return () => {
+      isMounted = false;
+      source.cancel("Component unmounted");
+      // Cancel any ongoing API requests here
+    };
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
@@ -91,65 +122,76 @@ function HomePage({ navigation, user }) {
         navigation={navigation}
         name={"أهلاً " + user.profile.name.split(" ")[0]}
       ></Header>
-      <ScrollView style={{width:'100%'}} contentContainerStyle={{ alignItems:'center'}}>
-      <NewsCarousel></NewsCarousel>
-      {latitude === null && longitude === null ? (
-        <View style={styles.locationCaution}>
-          <View style={{ flexDirection: "row" }}>
-            <Pressable
-              onPress={() => {
-                getLocationPermission().catch((err) => {
-                  console.log(err);
-                });
-              }}
-            >
-              <Text style={{ color: Colors.darkGreen, fontWeight: "900" }}>
-                إضغط
-              </Text>
-            </Pressable>
-            <Text> لتحديد موقعك لإستفادة من خدمات الموقع</Text>
+      <ScrollView
+        style={{ width: "100%" }}
+        contentContainerStyle={{ alignItems: "center" }}
+      >
+        <NewsCarousel></NewsCarousel>
+        {latitude === null && longitude === null ? (
+          <View style={styles.locationCaution}>
+            <View style={{ flexDirection: "row" }}>
+              <Pressable
+                onPress={() => {
+                  getLocationPermission().catch((err) => {
+                    console.log(err);
+                  });
+                }}
+              >
+                <Text style={{ color: Colors.darkGreen, fontWeight: "900" }}>
+                  إضغط
+                </Text>
+              </Pressable>
+              <Text> لتحديد موقعك لإستفادة من خدمات الموقع</Text>
+            </View>
           </View>
-        </View>
-      ) : null}
-      {!user.profile.accountIsActivated ? (
-        <View style={styles.locationCaution}>
-          <Text>سوف يتم تثبيت حسابك قريباً</Text>
-        </View>
-      ) : null}
-      <View style={styles.btnsContainer}>
-        <HomeBtns label={"خريطة"} handler={navigateMapPage}>
-          {" "}
-          <FontAwesome name="map-marker" size={24} color={Colors.darkGreen} />
-        </HomeBtns>
-        {user.role === "BASIC" ? <HomeBtns label={"المعاملات"} handler={navigateTransactionPage}>
-          {" "}
-          <Entypo
-            name="text-document-inverted"
-            size={24}
-            color={Colors.darkGreen}
-          />
-        </HomeBtns> : null }
-        {user.role === "BASIC" ?<HomeBtns label={"المحامون"} handler={navigateLawyerPage}>
-          <FontAwesome5
-            name="balance-scale"
-            size={24}
-            color={Colors.darkGreen}
-          />
-        </HomeBtns> : null}
-        <HomeBtns label={"المنتدى"} handler={navigateForumPage}>
-          {" "}
-          <MaterialCommunityIcons name="comment-quote" size={24} color={Colors.darkGreen} />
-        </HomeBtns>
-        <HomeBtns label={"المحادثات"} handler={navigateChatListPage}>
-          {" "}
-          <MaterialIcons name="forum" size={24} color={Colors.darkGreen} />
-        </HomeBtns>
+        ) : null}
+        {!user.profile.accountIsActivated ? (
+          <View style={styles.locationCaution}>
+            <Text>سوف يتم تثبيت حسابك قريباً</Text>
+          </View>
+        ) : null}
+        <View style={styles.btnsContainer}>
+          <HomeBtns label={"خريطة"} handler={navigateMapPage}>
+            {" "}
+            <FontAwesome name="map-marker" size={24} color={Colors.darkGreen} />
+          </HomeBtns>
+          {user.role === "BASIC" ? (
+            <HomeBtns label={"المعاملات"} handler={navigateTransactionPage}>
+              {" "}
+              <Entypo
+                name="text-document-inverted"
+                size={24}
+                color={Colors.darkGreen}
+              />
+            </HomeBtns>
+          ) : null}
+          {user.role === "BASIC" ? (
+            <HomeBtns label={"المحامون"} handler={navigateLawyerPage}>
+              <FontAwesome5
+                name="balance-scale"
+                size={24}
+                color={Colors.darkGreen}
+              />
+            </HomeBtns>
+          ) : null}
+          <HomeBtns label={"المنتدى"} handler={navigateForumPage}>
+            {" "}
+            <MaterialCommunityIcons
+              name="comment-quote"
+              size={24}
+              color={Colors.darkGreen}
+            />
+          </HomeBtns>
+          <HomeBtns label={"المحادثات"} handler={navigateChatListPage}>
+            {" "}
+            <MaterialIcons name="forum" size={24} color={Colors.darkGreen} />
+          </HomeBtns>
 
-        <HomeBtns label={"الحجوزات"} handler={navigateForumPage}>
-          {" "}
-          <Entypo name="bookmark" size={24} color={Colors.darkGreen} />
-        </HomeBtns>
-      </View>
+          <HomeBtns label={"الحجوزات"} handler={navigateBookingPage}>
+            {" "}
+            <Entypo name="bookmark" size={24} color={Colors.darkGreen} />
+          </HomeBtns>
+        </View>
       </ScrollView>
     </View>
   );

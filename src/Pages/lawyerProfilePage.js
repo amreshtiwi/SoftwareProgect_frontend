@@ -71,14 +71,14 @@ function LawyerProfilePage({ navigation, id, user }) {
   };
 
   const NavigatebookingPage = () => {
-    if (user.profile.accountIsActivated) {
+    if (!user.profile.accountIsActivated) {
       Toast.show({
         type: "info",
         text1: "عزيزي المواطن",
         text2: "لا يمكن حجز موعد حتى يتم تثبيت الحساب",
       });
     } else {
-      navigation.navigate("BookingPage");
+      navigation.navigate("BookingPage",{ Bookings : lawyer.Booking , id: lawyer.id , user: user});
     }
   };
 

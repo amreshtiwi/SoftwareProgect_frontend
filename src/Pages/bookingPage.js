@@ -11,17 +11,19 @@ import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 import AddTime from "../Component/addTime";
 import { Provider } from "react-native-paper";
 import { getBookings } from "../api/getBooks";
+import { MenuProvider } from "react-native-popup-menu";
 
-function BookingPage({ navigation }) {
+function BookingPage({ navigation, route }) {
+  const { Bookings, id, user } = route.params;
   const [selectedDate, setSelectedDate] = useState("");
   const [addTimeModalVisible, setAddTimeModalVisible] = useState(false);
-  const [agendaData,setAgendaData] = useState([]);
+  const [agendaData, setAgendaData] = useState([]);
+  const today = new Date();
 
   useEffect(() => {
-    getBookings().then(result => {
-      setAgendaData(result);
-    }).catch(err => {console.log(err);})
-  },[])
+    setAgendaData(Bookings);
+    console.log(Bookings);
+  }, []);
 
   const back = () => {
     navigation.goBack();
@@ -44,64 +46,6 @@ function BookingPage({ navigation }) {
     setAddTimeModalVisible(false);
   };
 
-  // const agendaData = [
-  //   {
-  //     id: 1,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-17",
-  //     startTime: "9:15 AM",
-  //     endTime: "9:40 AM",
-  //     descrption: "استشارة",
-  //   },
-  //   {
-  //     id: 2,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-17",
-  //     startTime: "9:40 AM",
-  //     endTime: "10:40 AM",
-  //     descrption: "دفع ايجار",
-  //   },
-  //   {
-  //     id: 3,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-17",
-  //     startTime: "11:10 AM",
-  //     endTime: "11:30 AM",
-  //     descrption: "توقيع عقد ايجار",
-  //   },
-  //   {
-  //     id: 4,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-20",
-  //     startTime: "9:15 AM",
-  //     endTime: "9:40 AM",
-  //     descrption: "استشارة",
-  //   },
-  //   {
-  //     id: 5,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-15",
-  //     startTime: "9:15 AM",
-  //     endTime: "9:40 AM",
-  //     descrption: "استشارة",
-  //   },
-  //   {
-  //     id: 6,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-15",
-  //     startTime: "12:00 PM",
-  //     endTime: "1:00 PM",
-  //     descrption: "استشارة",
-  //   },
-  //   {
-  //     id: 7,
-  //     userName: "احمد محمد",
-  //     date: "2023-05-23",
-  //     startTime: "9:15 AM",
-  //     endTime: "9:40 AM",
-  //     descrption: "استشارة",
-  //   },
-  // ];
   LocaleConfig.locales["ar"] = {
     monthNames: [
       "يناير",
@@ -145,57 +89,77 @@ function BookingPage({ navigation }) {
 
   LocaleConfig.defaultLocale = "ar";
   return (
-    <Provider>
-      <View style={styles.container}>
-        <View style={styles.bar}>
-          <HeaderPages back={back} label={"حجز موعد"}></HeaderPages>
-        </View>
+    <MenuProvider>
+      <Provider>
+        <View style={styles.container}>
+          <View style={styles.bar}>
+            <HeaderPages back={back} label={"حجز موعد"}></HeaderPages>
+          </View>
 
-        <Text style={styles.calenderText}>
-          قم بإختيار موعد مناسب عند المحامي
-        </Text>
-        <View style={{ width: "90%" }}>
-          <Calendar
-            onDayPress={onDayPress}
-            style={styles.calender}
-            theme={styles.calendarTheme}
-            markedDates={{
-              [selectedDate]: {
-                selected: true,
-                disableTouchEvent: true,
-                selectedDotColor: Colors.darkGreen,
-              },
-            }}
-          />
-        </View>
-        {selectedDate !== "" && (
-          <>
-            <View
-              style={{
-                height: Dimensions.get("window").height / 2.6,
-                width: "100%",
+          {id !== "0" ? (
+            <Text style={styles.calenderText}>
+              قم بإختيار موعد مناسب عند المحامي
+            </Text>
+          ) : null}
+          <View style={{ width: "90%" }}>
+            <Calendar
+              onDayPress={onDayPress}
+              style={styles.calender}
+              theme={styles.calendarTheme}
+              markedDates={{
+                [selectedDate]: {
+                  selected: true,
+                  disableTouchEvent: true,
+                  selectedDotColor: Colors.darkGreen,
+                },
               }}
-            >
-              <ScrollView>
-                <View style={{ alignItems: "center" }}>
-                  <AgendaMeettings date={selectedDate} agendaData={agendaData}></AgendaMeettings>
-                </View>
-              </ScrollView>
-            </View>
-            <Pressable style={styles.chooseTime} onPress={showModal}>
-              <Text style={styles.chooseTimeText}>احجز موعد</Text>
-              <MaterialIcons name="alarm-add" size={24} color={Colors.black} />
-            </Pressable>
-            <AddTime
-              visible={addTimeModalVisible}
-              hideModal={hideModal}
-              date={selectedDate}
-              agendaData={agendaData}
-            ></AddTime>
-          </>
-        )}
-      </View>
-    </Provider>
+            />
+          </View>
+          {selectedDate !== "" && (
+            <>
+              <View
+                style={{
+                  height: Dimensions.get("window").height / 2.6,
+                  width: "100%",
+                }}
+              >
+                <ScrollView>
+                  <View style={{ alignItems: "center" }}>
+                    <AgendaMeettings
+                      date={selectedDate}
+                      agendaData={agendaData}
+                      handleSetAgenda={setAgendaData}
+                      userId={user.id}
+                    ></AgendaMeettings>
+                  </View>
+                </ScrollView>
+              </View>
+              {id !== "0" ? (
+                new Date(selectedDate) < today ? null : (
+                  <Pressable style={styles.chooseTime} onPress={showModal}>
+                    <Text style={styles.chooseTimeText}>احجز موعد</Text>
+                    <MaterialIcons
+                      name="alarm-add"
+                      size={24}
+                      color={Colors.black}
+                    />
+                  </Pressable>
+                )
+              ) : null}
+
+              <AddTime
+                visible={addTimeModalVisible}
+                hideModal={hideModal}
+                date={selectedDate}
+                agendaData={agendaData}
+                handleSetAgenda={setAgendaData}
+                id={id}
+              ></AddTime>
+            </>
+          )}
+        </View>
+      </Provider>
+    </MenuProvider>
   );
 }
 
@@ -216,6 +180,7 @@ const styles = StyleSheet.create({
   calender: {
     width: "100%",
     borderRadius: 20,
+    marginTop:20
   },
   calendarTheme: {
     backgroundColor: Colors.lightVanilla1,

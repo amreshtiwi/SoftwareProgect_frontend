@@ -13,6 +13,7 @@ function MyTransactionPage({navigation}) {
   const [myTransaction, setMyTransaction] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const isFocused = useIsFocused();
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,11 +38,15 @@ function MyTransactionPage({navigation}) {
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
-  }, [isFocused]);
+  }, [isFocused,refresh]);
 
   const back = () => {
     navigation.goBack();
   };
+
+  const handleRefresh = (refresh) => {
+    setRefresh(refresh);
+  }
   return (
     <MenuProvider>
     <View style={styles.container}>
@@ -52,7 +57,7 @@ function MyTransactionPage({navigation}) {
         <ScrollView showsVerticalScrollIndicator={false}  style={{ width: "90%", marginVertical: 10,height:Dimensions.get('window').height-90 }}>
             {myTransaction.map((item) => {
                 return (
-                    <MyTransactionItem key={item.id} item={item}></MyTransactionItem>
+                    <MyTransactionItem key={item.id} item={item} refresh={refresh} handleReresh={handleRefresh}></MyTransactionItem>
                 );
             })}
         </ScrollView>

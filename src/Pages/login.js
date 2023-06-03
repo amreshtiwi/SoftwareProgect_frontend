@@ -18,7 +18,6 @@ import { auth } from "../store/firebase";
 
 I18nManager.forceRTL(true);
 function LoginPage({ navigation }) {
-
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,13 +38,12 @@ function LoginPage({ navigation }) {
       }
       setToken(userToken);
 
-      if(userToken !== null){
-        navigation.replace('drawer')
+      if (userToken !== null) {
+        navigation.replace("drawer");
       }
     };
 
-
-      bootstrapAsync();
+    bootstrapAsync();
   }, []);
 
   function signUpNavigation() {
@@ -54,39 +52,38 @@ function LoginPage({ navigation }) {
 
   const logIn = async (data) => {
     loginApi({
-        email: data.email.toLocaleLowerCase(),
-        password: data.password,
-      })
-        .then((result) => {
-          if (result.status == 200) {
-            AsyncStorage.setItem("userID", result.data.id.toString());
+      email: data.email.toLocaleLowerCase(),
+      password: data.password,
+    })
+      .then((result) => {
+        if (result.status == 200) {
+          AsyncStorage.setItem("userID", result.data.id.toString());
 
-            console.log("userID app.js : ", result.data.id.toString());
+          console.log("userID app.js : ", result.data.id.toString());
 
-            AsyncStorage.setItem("AccessToken", result.data.token);
-            setToken(result.data.token);
+          AsyncStorage.setItem("AccessToken", result.data.token);
+          setToken(result.data.token);
 
-            auth
-            .signInWithEmailAndPassword(data.email, data.password).then(
-              result =>{
-                console.log('fireBase log in Done by email and password');
-              }
-            )
+          auth
+            .signInWithEmailAndPassword(data.email, data.password)
+            .then((result) => {
+              console.log("fireBase log in Done by email and password");
+            })
             .catch((error) => {
               // var errorCode = error.code;
               var errorMessage = error.message;
               console.log("login firebase:", errorMessage);
             });
-            navigation.replace('drawer');
-            setLoginCation(false);
-          } else {
-            setLoginCation(true);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-}
+          navigation.replace("drawer");
+          setLoginCation(false);
+        } else {
+          setLoginCation(true);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return (
     <KeyboardAwareScrollView>
@@ -155,7 +152,7 @@ function LoginPage({ navigation }) {
             }}
           />
         </View>
-        {loginCaution  ? (
+        {loginCaution ? (
           <Text style={{ color: Colors.red }}>
             كلمة المرور أو البريد الإلكتروني غير صحيحة
           </Text>
@@ -164,10 +161,15 @@ function LoginPage({ navigation }) {
         )}
         <View style={styles.infoSignUp}>
           <Pressable>
-            <Text>نسيت كلمة المرور؟ ,</Text>
+            <Text style={{ color: Colors.darkGreen }}>نسيت كلمة المرور؟ ,</Text>
           </Pressable>
           <Pressable>
-            <Text>ليس لدي حساب</Text>
+            <Text
+              style={{ color: Colors.darkGreen }}
+              onPress={signUpNavigation}
+            >
+              ليس لدي حساب
+            </Text>
           </Pressable>
         </View>
         <Pressable

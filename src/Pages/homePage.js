@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom:3
   },
 });
 export default HomePage;

@@ -16,6 +16,8 @@ function AddQuestion({
   updateTitle = "",
   updateDescrption = "",
   id = 0,
+  refersh,
+  handleRefresh,
 }) {
   const [title, setTitle] = useState(updateTitle);
   const [description, setDescription] = useState(updateDescrption);
@@ -33,6 +35,7 @@ function AddQuestion({
         console.log(update);
         updatePost(
           JSON.stringify({
+            id: id,
             title: title,
             description: description,
           }),
@@ -47,7 +50,9 @@ function AddQuestion({
               setPostDoneModal(false);
             }, 1500);
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.log(err)).finally(() => {
+            handleRefresh(!refersh);
+          });
       } else {
         createPost(JSON.stringify(postObject))
           .then((result) => {
@@ -104,7 +109,7 @@ function AddQuestion({
           <Text style={{ color: "red" }}>يرجى تعبئة جميع الفراغات</Text>
         ) : null}
 
-        <Btn value={update ? "نعديل" : "نشر"} handler={addQustion}></Btn>
+        <Btn value={update ? "تعديل" : "نشر"} handler={addQustion}></Btn>
       </Modal>
     </Portal>
   );

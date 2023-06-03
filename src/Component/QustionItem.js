@@ -28,6 +28,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { deletePost } from "../api/deletePostApi";
 import AddQuestion from "./addQuestion";
+import { useEffect } from "react";
 
 function QuestionItem({ item, user, refersh, handleRefresh }) {
   const [visible, setVisble] = useState(false);
@@ -42,6 +43,8 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
     const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
     return differenceInDays;
   };
+
+
 
   const showModal = () => {
     getUserApi(item.authorId)
@@ -106,6 +109,9 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
         update={true}
         updateTitle={item.title}
         updateDescrption={item.description}
+        id={item.id}
+        refersh ={refersh}
+        handleRefresh={handleRefresh}
       ></AddQuestion>
       <Portal>
         {userInfo ? (

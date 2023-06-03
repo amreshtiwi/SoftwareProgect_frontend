@@ -63,16 +63,15 @@ function ForumPage({ navigation, user }) {
   }, [isFocused, postDoneModal, isSwitchOn, refersh]);
 
   const showModal = () => {
-    if(!user.profile.accountIsActivated){
+    if (!user.profile.accountIsActivated) {
       Toast.show({
         type: "info",
         text1: "عزيزي المواطن",
         text2: "لا يمكنك النشر حتى يتم تثبيت الحساب",
       });
-    }else{
+    } else {
       setAddQuestionModalVisible(true);
     }
-    
   };
   const hideModal = () => {
     setAddQuestionModalVisible(false);
@@ -90,66 +89,72 @@ function ForumPage({ navigation, user }) {
     setRefersh(refersh);
   };
 
-  const handleEdit = (title, description) => {
-    
-  }
+  const handleEdit = (title, description) => {};
   return (
     <MenuProvider>
-    <Provider>
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ marginTop: 20 }}
-          showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[1]}
-        >
-          <View style={styles.bar}>
-            <HeaderPages label={"المنتدى"} back={back}></HeaderPages>
-          </View>
-
-          <View style={{ backgroundColor: Colors.lightVanilla }}>
-            <SearchInput
-              onChangeSearch={onChangeSearch}
-              searchQuery={searchQuery}
-            ></SearchInput>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Switch
-                value={isSwitchOn}
-                onValueChange={onToggleSwitch}
-                color={Colors.darkGreen}
-              />
-              <Text>أسئلتي</Text>
+      <Provider>
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ marginTop: 20 }}
+            showsVerticalScrollIndicator={false}
+            stickyHeaderIndices={[1]}
+          >
+            <View style={styles.bar}>
+              <HeaderPages label={"المنتدى"} back={back}></HeaderPages>
             </View>
-          </View>
-          <View style={{ alignItems: "center" }}>
-            {isLoading ? (
-              <View>
-                <ActivityIndicator size="large" color={Colors.darkGreen} />
-              </View>
-            ) : posts !== null ? (
-              posts.map((item) => {
-                return <QuestionItem key={item.id} item={item} user={user} refersh={refersh} handleRefresh={handleRefersh}></QuestionItem>;
-              })
-            ) : (
-              <View>
-                <Text>لا يوجد أسئلة حتى الأن</Text>
-              </View>
-            )}
-          </View>
-        </ScrollView>
-        <View style={styles.addQuestionBtn}>
-          <Pressable onPress={showModal}>
-            <Ionicons name="add-circle" size={26} color={Colors.black} />
-          </Pressable>
-        </View>
 
-        <AddQuestion
-          visible={addQuestionModalVisible}
-          hideModal={hideModal}
-          postDoneModal={postDoneModal}
-          setPostDoneModal={setPostDoneModal}
-        ></AddQuestion>
-      </View>
-    </Provider>
+            <View style={{ backgroundColor: Colors.lightVanilla }}>
+              <SearchInput
+                onChangeSearch={onChangeSearch}
+                searchQuery={searchQuery}
+              ></SearchInput>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Switch
+                  value={isSwitchOn}
+                  onValueChange={onToggleSwitch}
+                  color={Colors.darkGreen}
+                />
+                <Text>أسئلتي</Text>
+              </View>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              {isLoading ? (
+                <View>
+                  <ActivityIndicator size="large" color={Colors.darkGreen} />
+                </View>
+              ) : posts !== null ? (
+                posts.map((item) => {
+                  return (
+                    <QuestionItem
+                      key={item.id}
+                      item={item}
+                      user={user}
+                      refersh={refersh}
+                      handleRefresh={handleRefersh}
+                    ></QuestionItem>
+                  );
+                })
+              ) : (
+                <View>
+                  <Text>لا يوجد أسئلة حتى الأن</Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
+          <View style={styles.addQuestionBtn}>
+            <Pressable onPress={showModal}>
+              <Ionicons name="add-circle" size={26} color={Colors.black} />
+            </Pressable>
+          </View>
+
+          <AddQuestion
+            visible={addQuestionModalVisible}
+            hideModal={hideModal}
+            postDoneModal={postDoneModal}
+            setPostDoneModal={setPostDoneModal}
+          ></AddQuestion>
+        </View>
+      </Provider>
     </MenuProvider>
   );
 }

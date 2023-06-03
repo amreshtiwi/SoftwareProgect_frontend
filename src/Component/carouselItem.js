@@ -19,10 +19,10 @@ function CarouselItem({ item }) {
           height: 230,
           borderRadius: 20,
         }}
-        source={item.url}
+        source={{uri : item.url}}
       />
       <View style={styles.cardTxtContainer}>
-        <Text style={styles.cardTxt}>{item.summary}</Text>
+        <Text style={styles.cardTxt}>{item.title}</Text>
       </View>
     </View>
   );

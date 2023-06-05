@@ -19,6 +19,7 @@ import { auth } from "../store/firebase";
 import TransactionPage from "../Pages/transactionPage";
 import CreateTransactionPage from "../Pages/createTransactionPage";
 import MyTransactionPage from "../Pages/myTransactionPage";
+import MyBookingsPage from "../Pages/myBookings";
 
 const DrawerNavigator = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -153,7 +154,7 @@ function DrawerNavigation() {
           {(props) => <ChatList {...props} user={user} />}
         </DrawerNavigator.Screen>
         <DrawerNavigator.Screen name="chat" component={ChatPage} />
-        <DrawerNavigator.Screen name="userBookings" component={BookingPage}/>
+        <DrawerNavigator.Screen name="userBookings" component={MyBookingsPage}/>
         <DrawerNavigator.Screen name="transactionStack">
           {(props) => <TransactionStack {...props} user={user} />}
         </DrawerNavigator.Screen>

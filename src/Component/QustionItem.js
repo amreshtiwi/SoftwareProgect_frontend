@@ -29,12 +29,15 @@ import { Entypo } from "@expo/vector-icons";
 import { deletePost } from "../api/deletePostApi";
 import AddQuestion from "./addQuestion";
 import { useEffect } from "react";
+import { AddNewComment } from "../api/addComment";
 
 function QuestionItem({ item, user, refersh, handleRefresh }) {
   const [visible, setVisble] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [updateModalVisibale, setUpdateModalVisible] = useState(false);
   const [postDoneModal, setPostDoneModal] = useState(false);
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState(item.comments);
 
   const getDays = () => {
     const qustionDate = new Date(item.created);
@@ -43,8 +46,6 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
     const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
     return differenceInDays;
   };
-
-
 
   const showModal = () => {
     getUserApi(item.authorId)
@@ -67,6 +68,26 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
         text1: "عزيزي المحامي",
         text2: "لا يمكنك إضافة تعليق حتى يتم تثبيت الحساب",
       });
+    } else {
+      if (comment.length > 0) {
+        const newComment = {
+          postId: item.id,
+          title: "تعليق",
+          data: comment,
+        };
+        const updatedComments = [...comments];
+        AddNewComment(JSON.stringify(newComment))
+          .then((result) => {
+            updatedComments.push(result.data);
+            setComments(updatedComments);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setComment("");
+          });
+      }
     }
   };
 
@@ -97,8 +118,6 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
     setVisble(false);
   };
 
-
-
   return (
     <>
       <AddQuestion
@@ -110,7 +129,7 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
         updateTitle={item.title}
         updateDescrption={item.description}
         id={item.id}
-        refersh ={refersh}
+        refersh={refersh}
         handleRefresh={handleRefresh}
       ></AddQuestion>
       <Portal>
@@ -162,16 +181,16 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
               <Divider style={styles.divider}></Divider>
 
               <View>
-        
-                {user.id === userInfo.id  ? (
+                {user.id === userInfo.id ? (
                   <Menu>
                     <MenuTrigger
-                              customStyles={{
-                                triggerWrapper: {
-                                  top: 0,
-                                  right:0,
-                                },
-                              }}>
+                      customStyles={{
+                        triggerWrapper: {
+                          top: 0,
+                          right: 0,
+                        },
+                      }}
+                    >
                       <Entypo
                         name="dots-three-vertical"
                         size={18}
@@ -195,7 +214,7 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
               <View style={styles.comments}>
                 <Text>التعليقات</Text>
                 <ScrollView>
-                  {item.comments.map((comment, index) => {
+                  {comments.map((comment, index) => {
                     return (
                       <Comment key={index} commentValue={comment}></Comment>
                     );
@@ -205,7 +224,14 @@ function QuestionItem({ item, user, refersh, handleRefresh }) {
                 </ScrollView>
                 {user.role === "LAWYER" ? (
                   <View style={styles.addComment}>
-                    <Input label={"إضافة تعليق"} width="88%"></Input>
+                    <Input
+                      label={"إضافة تعليق"}
+                      width="88%"
+                      value={comment}
+                      onChangeText={(comment) => {
+                        setComment(comment);
+                      }}
+                    ></Input>
                     <Pressable
                       style={styles.addCommentButton}
                       onPress={addComment}

@@ -39,7 +39,7 @@ function HomePage({ navigation, user }) {
   };
 
   const navigateBookingPage = () => {
-    navigation.navigate("userBookings",{Bookings:bookings , id: "0", user: user});
+    navigation.navigate("userBookings",{ id: user.id,});
   };
 
   const navigateChatListPage = () => {

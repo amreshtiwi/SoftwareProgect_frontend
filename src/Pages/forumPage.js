@@ -36,8 +36,8 @@ function ForumPage({ navigation, user }) {
     let source = axios.CancelToken.source();
     if (isFocused) {
       setIsLoading(true); // set isLoading to true when API call starts
-
-      getAllPost()
+      setTimeout(() => {
+        getAllPost(searchQuery)
         .then((result) => {
           if (isMounted) {
             if (isSwitchOn) {
@@ -53,6 +53,7 @@ function ForumPage({ navigation, user }) {
         .finally(() => {
           setIsLoading(false); // set isLoading to false when API call completes
         });
+      }, 500);
     }
 
     return () => {
@@ -60,7 +61,7 @@ function ForumPage({ navigation, user }) {
       source.cancel("Component unmounted");
       // Cancel any ongoing API requests here
     };
-  }, [isFocused, postDoneModal, isSwitchOn, refersh]);
+  }, [isFocused, postDoneModal, isSwitchOn, refersh, searchQuery]);
 
   const showModal = () => {
     if (!user.profile.accountIsActivated) {
@@ -91,7 +92,6 @@ function ForumPage({ navigation, user }) {
 
   const handleEdit = (title, description) => {};
   return (
-    <MenuProvider>
       <Provider>
         <View style={{ flex: 1 }}>
           <ScrollView
@@ -155,7 +155,7 @@ function ForumPage({ navigation, user }) {
           ></AddQuestion>
         </View>
       </Provider>
-    </MenuProvider>
+
   );
 }
 

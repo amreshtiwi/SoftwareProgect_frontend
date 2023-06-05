@@ -160,8 +160,8 @@ function MapPage({ navigation, route }) {
                       latitude: item.coordinate.lat,
                       longitude: item.coordinate.lng,
                     }}
-                    // title={item.title}
-                    // description={item.description}
+                    title={item.title}
+                    description={item.description}
                     pinColor={Colors.darkGreen}
                     icon={require("frontend/assets/binance.png")}
                     onPress={getCoordinate}

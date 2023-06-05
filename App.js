@@ -15,6 +15,7 @@ import SignupFlow from "./src/store/signUpstore";
 import { auth } from "./src/store/firebase";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { BaseToast } from "react-native-toast-message";
+import { MenuProvider } from "react-native-popup-menu";
 
 I18nManager.forceRTL(true);
 
@@ -38,7 +39,7 @@ export default function App() {
   return (
     <>
       <StatusBar style="auto" />
-
+      <MenuProvider>
       <NavigationContainer theme={MyTheme}>
         <Stack.Navigator
           screenOptions={{
@@ -51,6 +52,7 @@ export default function App() {
 
         </Stack.Navigator>
       </NavigationContainer>
+      </MenuProvider>
       <Toast config={toastconfig}/>
     </>
   );

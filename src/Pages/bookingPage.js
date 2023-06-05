@@ -89,7 +89,7 @@ function BookingPage({ navigation, route }) {
 
   LocaleConfig.defaultLocale = "ar";
   return (
-    <MenuProvider>
+    
       <Provider>
         <View style={styles.container}>
           <View style={styles.bar}>
@@ -159,7 +159,7 @@ function BookingPage({ navigation, route }) {
           )}
         </View>
       </Provider>
-    </MenuProvider>
+    
   );
 }
 

@@ -9,7 +9,14 @@ import { format } from "date-fns";
 import moment from "moment";
 import { createBooking } from "../api/createBooking";
 
-function AddTime({ visible, hideModal, date, agendaData , handleSetAgenda ,id }) {
+function AddTime({
+  visible,
+  hideModal,
+  date,
+  agendaData,
+  handleSetAgenda,
+  id,
+}) {
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -105,13 +112,15 @@ function AddTime({ visible, hideModal, date, agendaData , handleSetAgenda ,id })
 
     const updatedBookings = [...agendaData];
     
-
-    createBooking(JSON.stringify(bookingsData)).then(result => {
-      updatedBookings.push(result.data);
-    }).catch(err => console.error(err)).finally(() => {
-      handleSetAgenda(updatedBookings);
-      hideModal();
-    });
+    createBooking(JSON.stringify(bookingsData))
+      .then((result) => {
+        updatedBookings.push(result.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        handleSetAgenda(updatedBookings);
+        hideModal();
+      });
   };
   return (
     <Portal>
@@ -146,7 +155,6 @@ function AddTime({ visible, hideModal, date, agendaData , handleSetAgenda ,id })
             mode="time"
             onConfirm={handleStartTimeConfirm}
             onCancel={hideStartTimePicker}
-            
           />
           <Pressable
             style={[styles.timeViewComponent, { alignItems: "flex-end" }]}

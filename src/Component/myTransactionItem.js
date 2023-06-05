@@ -86,7 +86,9 @@ function MyTransactionItem({ item, refresh, handleReresh }) {
             size={36}
             color={Colors.darkGreen}
           />
-          <Text style={styles.tabTitle}>{item.description}</Text>
+          <View style={{ display: "flex" }}>
+            <Text style={styles.tabTitle}>{item.description}</Text>
+          </View>
           {item.status === "WAITTING" ? (
             <Text
               style={[
@@ -112,7 +114,6 @@ function MyTransactionItem({ item, refresh, handleReresh }) {
           )}
         </View>
       </Pressable>
-
       <Menu>
         <MenuTrigger
           customStyles={{
@@ -125,11 +126,6 @@ function MyTransactionItem({ item, refresh, handleReresh }) {
           <Entypo name="dots-three-vertical" size={18} color="grey" />
         </MenuTrigger>
         <MenuOptions style={styles.menuOptions}>
-          <MenuOption
-            style={styles.menuOption}
-            onSelect={() => alert(`Save`)}
-            text="تعديل"
-          />
           <MenuOption onSelect={deleteTransaction} text="حذف" />
         </MenuOptions>
       </Menu>
@@ -152,9 +148,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.darkGreen,
   },
   myTransactionItem: {
-    width: "95%",
+    width:270,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent:'space-between',
   },
   tabIcon: {
     marginHorizontal: 5,

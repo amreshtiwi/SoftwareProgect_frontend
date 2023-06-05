@@ -48,7 +48,7 @@ function MyTransactionPage({navigation}) {
     setRefresh(refresh);
   }
   return (
-    <MenuProvider>
+    
     <View style={styles.container}>
       <HeaderPages label={"معاملاتي"} back={back}></HeaderPages>
       {isLoading ? (
@@ -63,7 +63,7 @@ function MyTransactionPage({navigation}) {
         </ScrollView>
       ) : <View><Text>لا يوجد معاملات حتى الأن</Text></View>}
     </View>
-    </MenuProvider>
+    
   );
 }
 const styles = StyleSheet.create({

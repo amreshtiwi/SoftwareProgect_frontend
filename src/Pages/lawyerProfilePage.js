@@ -102,7 +102,7 @@ function LawyerProfilePage({ navigation, id, user }) {
         text2: "المحامي لم يحدد موقعه على الخريطة بعد",
       });
     }
-    else if(user.latitude === null || user.longitude === null){
+    else if(user.latitude === null && user.longitude === null){
       Toast.show({
         type: "info",
         text1: "عزيزي المواطن",

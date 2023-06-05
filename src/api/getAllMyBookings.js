@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ApiManager from "./apiManager";
 
-export const getAllPost = async (searchQuery) => {
+export const getAllMyBookings = async () => {
     try{
-        const uri = "/posts?text="+searchQuery;
+        const uri = "/users/bookings";
         const token = await AsyncStorage.getItem("AccessToken");
         const result = await ApiManager(uri,{
             method: "GET",
@@ -12,8 +12,10 @@ export const getAllPost = async (searchQuery) => {
                 "Authorization":'Bearer '+ token,
             },
         })
+
         return result;
     }catch (err){
+        console.log(err);
         return err.response.data;
     }
 }
